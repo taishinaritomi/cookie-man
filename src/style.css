@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  overflow-y: overlay;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+input {
+  @apply font-sans font-medium;
+}
+
+button,
+input,
+textarea,
+select {
+  @apply outline-none focus-visible:ring-2;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+}

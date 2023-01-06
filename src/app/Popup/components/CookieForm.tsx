@@ -1,10 +1,13 @@
 import { IoChevronDown, IoTrash } from 'solid-icons/io';
 import { createSignal, mergeProps, onMount } from 'solid-js';
-import type { Cookie, CookieSameSite } from '../states/cookie';
+import type {
+  Cookie,
+  CookieSameSite,
+  CookieSetDetails,
+} from '../states/cookie';
 import { currentUrl } from '../states/cookie';
 import { CheckBox } from '@/components/CheckBox';
 import { TextBox } from '@/components/TextBox';
-import type { CookieSetDetails } from '@/utils/chrome';
 import { cls } from '@/utils/cls';
 import { dateToUnixTime } from '@/utils/date';
 
@@ -36,7 +39,7 @@ export const CookieForm = (_props: {
   const onSave = () => {
     const expirationDate = dateToUnixTime(new Date(formRefs.expiration?.value));
     const setDetails: CookieSetDetails = {
-      url: currentUrl(),
+      url: currentUrl() || '',
       name: formRefs.name.value || undefined,
       value: encodeURIComponent(formRefs.value.value) || undefined,
       path: formRefs.path.value || undefined,

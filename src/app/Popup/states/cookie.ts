@@ -1,17 +1,11 @@
 import { createEffect, createSignal } from 'solid-js';
 import { alphabetSort, booleanSort } from '@/utils/array';
-import type { ChromeCookie, CookieSetDetails } from '@/utils/chrome';
-import {
-  getChromeCookieUrl,
-  getChromeCookies,
-  getCurrentUrl,
-  removeChromeCookie,
-  setChromeCookie,
-} from '@/utils/chrome';
 import { unixTimeToDate } from '@/utils/date';
 
 // Types
-
+export type ChromeCookie = chrome.cookies.Cookie;
+export type CookieSetDetails = chrome.cookies.SetDetails;
+export type CookieSameSite = ChromeCookie['sameSite'];
 export type Cookie = {
   match: boolean;
   searchName: string;
@@ -19,8 +13,6 @@ export type Cookie = {
   displayExpiration: string;
   chromeCookie: ChromeCookie;
 };
-
-export type CookieSameSite = ChromeCookie['sameSite'];
 
 // States
 
@@ -57,19 +49,28 @@ const chromeCookieFormat = (chromeCookie: ChromeCookie): Cookie => {
   };
 };
 
-const getSearchText = (text: string): [text: string, isUrl: boolean] => {
-  const isUrl = text.startsWith('#');
-  return isUrl ? [text.slice(1), isUrl] : [text, isUrl];
+const getSearchText = (text: string): [text: string, isName: boolean] => {
+  const isName = !text.startsWith('#');
+  return isName ? [text, isName] : [text.slice(1), isName];
+};
+
+/*
+  https://github.com/GoogleChrome/chrome-extensions-samples/blob/main/api/cookies/cookie-clearer/popup.js#L70
+  TODO:　When .domain.com(hostOnly: true) is deleted, .domain.com(hostOnly: false) is also deleted.
+*/
+const getChromeCookieUrl = (chromeCookie: ChromeCookie) => {
+  const protocol = chromeCookie.secure ? 'https:' : 'http:';
+  return `${protocol}//${chromeCookie.domain}${chromeCookie.path}`;
 };
 
 const searchCookiesSort = (cookies: Cookie[]) => {
-  const [searchText, isUrl] = getSearchText(searchInput() || '');
+  const [searchText, isName] = getSearchText(searchInput() || '');
   const newCookie = cookies
     .map((cookie) => {
       const match = searchText
-        ? isUrl
-          ? cookie.displayUrl.includes(searchText)
-          : cookie.searchName.includes(searchText)
+        ? isName
+          ? cookie.searchName.includes(searchText)
+          : cookie.displayUrl.includes(searchText)
         : false;
       return Object.assign({}, cookie, { match });
     })
@@ -78,8 +79,10 @@ const searchCookiesSort = (cookies: Cookie[]) => {
   return newCookie;
 };
 
-const refreshCurrentCookies = async () => {
-  const chromeCookies = await getChromeCookies(currentUrl());
+const refreshCookies = async () => {
+  const chromeCookies = await chrome.cookies.getAll({
+    url: currentUrl() || undefined,
+  });
   const currentCookies = chromeCookies.map((chromeCookie) => {
     return chromeCookieFormat(chromeCookie);
   });
@@ -87,16 +90,20 @@ const refreshCurrentCookies = async () => {
 };
 
 export const initCookies = async () => {
-  const currentUrl = await getCurrentUrl();
+  const [currentTab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+  const currentUrl = currentTab?.url;
   if (currentUrl) {
     setCurrentUrl(currentUrl);
     searchInput() && setSearchInput('');
     setIsOpenAddCookie(false);
-    await refreshCurrentCookies();
+    await refreshCookies();
   }
 };
 
-export const refreshCookies = async () => {
+export const reloadCookies = async () => {
   await Promise.all([initCookies(), new Promise((r) => setTimeout(r, 150))]);
 };
 
@@ -104,21 +111,29 @@ export const searchCookies = () => {
   setCookies((cookies) => searchCookiesSort(cookies));
 };
 
-export const addChromeCookie = async (setDetails: CookieSetDetails) => {
-  await setChromeCookie(setDetails);
-  await refreshCurrentCookies();
+export const addCookie = async (setDetails: CookieSetDetails) => {
+  await chrome.cookies.set(setDetails);
+  await refreshCookies();
 };
 
 export const updateCookie = async (
   oldCookie: Cookie,
   setDetails: CookieSetDetails,
 ) => {
-  await removeChromeCookie(oldCookie.chromeCookie);
-  await setChromeCookie(setDetails);
-  await refreshCurrentCookies();
+  await chrome.cookies.remove({
+    url: getChromeCookieUrl(oldCookie.chromeCookie),
+    name: oldCookie.chromeCookie.name,
+    storeId: oldCookie.chromeCookie.storeId,
+  });
+  await chrome.cookies.set(setDetails);
+  await refreshCookies();
 };
 
 export const removeCookie = async ({ chromeCookie }: Cookie) => {
-  await removeChromeCookie(chromeCookie);
-  await refreshCurrentCookies();
+  await chrome.cookies.remove({
+    url: getChromeCookieUrl(chromeCookie),
+    name: chromeCookie.name,
+    storeId: chromeCookie.storeId,
+  });
+  await refreshCookies();
 };

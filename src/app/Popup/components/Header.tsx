@@ -2,7 +2,7 @@ import { CgSpinner } from 'solid-icons/cg';
 import { IoAdd, IoRefresh, IoSearch } from 'solid-icons/io';
 import { createSignal } from 'solid-js';
 import {
-  refreshCookies,
+  reloadCookies,
   searchInput,
   setIsOpenAddCookie,
   setSearchInput,
@@ -39,7 +39,7 @@ const HeaderRight = () => {
       <button
         onClick={async () => {
           setLording(true);
-          await refreshCookies();
+          await reloadCookies();
           setLording(false);
         }}
         class="p-2 border block border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700"

@@ -7,7 +7,7 @@ import {
 } from 'solid-headless';
 import { IoChevronDown } from 'solid-icons/io';
 import { For, mergeProps } from 'solid-js';
-import type { Cookie } from '../states/cookie';
+import type { Cookie, CookieSetDetails } from '../states/cookie';
 import {
   cookies,
   initCookies,
@@ -15,7 +15,6 @@ import {
   updateCookie,
 } from '../states/cookie';
 import { CookieForm } from './CookieForm';
-import type { CookieSetDetails } from '@/utils/chrome';
 import { cls } from '@/utils/cls';
 
 initCookies();

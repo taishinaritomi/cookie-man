@@ -1,6 +1,6 @@
 import type { Cookie } from '../states/cookie';
 import { isOpenAddCookie, setIsOpenAddCookie } from '../states/cookie';
-import { addChromeCookie, currentUrl } from '../states/cookie';
+import { addCookie, currentUrl } from '../states/cookie';
 import { CookieForm } from './CookieForm';
 
 const getDefaultCookie = (): Cookie => {
@@ -40,7 +40,7 @@ const AddCookiePanel = () => {
         cookie={defaultCookie}
         isRemove={false}
         onSave={(newCookie) => {
-          addChromeCookie(newCookie);
+          addCookie(newCookie);
           setIsOpenAddCookie(false);
         }}
         onCancel={() => setIsOpenAddCookie(false)}

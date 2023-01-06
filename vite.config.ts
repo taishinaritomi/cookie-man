@@ -14,7 +14,7 @@ const manifest = defineManifest({
     128: 'cookie_icon.png',
   },
   action: {
-    default_popup: 'index.html',
+    default_popup: 'popup.html',
     default_icon: {
       19: 'cookie_icon.png',
       38: 'cookie_icon.png',

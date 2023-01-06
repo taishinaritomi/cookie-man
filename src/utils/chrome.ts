@@ -18,8 +18,12 @@ export const getChromeCookieUrl = (chromeCookie: ChromeCookie) => {
   return `${protocol}//${chromeCookie.domain}${chromeCookie.path}`;
 };
 
-export const getCurrentChromeCookies = async (url: string) => {
-  return await chrome.cookies.getAll({ url });
+export const getChromeCookies = async (url: string | null) => {
+  if (url) {
+    return await chrome.cookies.getAll({ url });
+  } else {
+    return [];
+  }
 };
 
 export const setChromeCookie = async (

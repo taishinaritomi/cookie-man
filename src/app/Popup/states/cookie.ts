@@ -3,7 +3,7 @@ import { alphabetSort, booleanSort } from '@/utils/array';
 import type { ChromeCookie, CookieSetDetails } from '@/utils/chrome';
 import {
   getChromeCookieUrl,
-  getCurrentChromeCookies,
+  getChromeCookies,
   getCurrentUrl,
   removeChromeCookie,
   setChromeCookie,
@@ -25,13 +25,14 @@ export type CookieSameSite = ChromeCookie['sameSite'];
 // States
 
 const [cookies, setCookies] = createSignal<Cookie[]>([]);
-const [currentUrl, setCurrentUrl] = createSignal<string>('');
+const [currentUrl, setCurrentUrl] = createSignal<string | null>(null);
 export const [isOpenAddCookie, setIsOpenAddCookie] =
   createSignal<boolean>(false);
 export const [searchInput, setSearchInput] = createSignal<string | null>(null);
 export { cookies, currentUrl };
 
 // Effects
+
 createEffect(() => {
   if (searchInput() !== null) {
     setCookies((cookies) => searchCookiesSort(cookies));
@@ -78,7 +79,7 @@ const searchCookiesSort = (cookies: Cookie[]) => {
 };
 
 const refreshCurrentCookies = async () => {
-  const chromeCookies = await getCurrentChromeCookies(currentUrl());
+  const chromeCookies = await getChromeCookies(currentUrl());
   const currentCookies = chromeCookies.map((chromeCookie) => {
     return chromeCookieFormat(chromeCookie);
   });

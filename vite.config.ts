@@ -20,8 +20,12 @@ const manifest = defineManifest({
       38: 'cookie_icon.png',
     },
   },
+  background: {
+    service_worker: 'src/background.ts',
+    type: 'module',
+  },
   host_permissions: ['<all_urls>'],
-  permissions: ['cookies'],
+  permissions: ['cookies', 'tabs', 'activeTab'],
 });
 
 export default defineConfig({

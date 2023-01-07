@@ -2,10 +2,11 @@ import { crx, defineManifest } from '@crxjs/vite-plugin';
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import packageJson from './package.json';
 
 const manifest = defineManifest({
   name: 'Cookie Man',
-  version: '0.0.1',
+  version: packageJson.version,
   manifest_version: 3,
   description: 'Cookie Manager',
   icons: {

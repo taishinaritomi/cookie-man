@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "nodemon -e ts,tsx,css,html --ignore dist --watch . --exec vite build",
     "build": "vite build",
-    "start": "node dist/index.js",
     "code:fix": "run-s code:fix:*",
     "code:fix:lint": "eslint . --fix --ignore-path .gitignore",
     "code:fix:format": "prettier . --write --ignore-path .gitignore",

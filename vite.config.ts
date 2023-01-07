@@ -15,10 +15,6 @@ const manifest = defineManifest({
   },
   action: {
     default_popup: 'popup.html',
-    default_icon: {
-      19: 'cookie_icon.png',
-      38: 'cookie_icon.png',
-    },
   },
   background: {
     service_worker: 'src/background.ts',

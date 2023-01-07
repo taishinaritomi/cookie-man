@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon -e ts,tsx,css,html --ignore dist --watch . --exec vite build",
-    "build": "vite build",
+    "build": "vite build && zip -r dist.zip dist/",
     "code:fix": "run-s code:fix:*",
     "code:fix:lint": "eslint . --fix --ignore-path .gitignore",
     "code:fix:format": "prettier . --write --ignore-path .gitignore",

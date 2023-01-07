@@ -9,9 +9,9 @@ const manifest = defineManifest({
   manifest_version: 3,
   description: 'Cookie Manager',
   icons: {
-    16: 'cookie_icon.png',
-    48: 'cookie_icon.png',
-    128: 'cookie_icon.png',
+    16: 'cookie_icon_16.png',
+    48: 'cookie_icon_48.png',
+    128: 'cookie_icon_128.png',
   },
   action: {
     default_popup: 'popup.html',

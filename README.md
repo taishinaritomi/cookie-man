@@ -3,7 +3,6 @@
 Cookie Manager for Chrome Extensions
 [here](https://chrome.google.com/webstore/detail/cookie-man/hocmdfhjbhdgbfbkknpnindlbhaalmbe)
 
-
 # Author
 
 [Taishi Naritomi](https://github.com/taishinaritomi)

@@ -3,11 +3,16 @@ const handler = async () => {
     active: true,
     currentWindow: true,
   });
-  const cookies = await chrome.cookies.getAll({ url: currentTab?.url });
-  const cookiesLengthBadge =
-    cookies.length === 0 ? '' : cookies.length.toString();
-  await chrome.action.setBadgeText({ text: cookiesLengthBadge });
-  await chrome.action.setBadgeBackgroundColor({ color: '#a16207' });
+  const currentUrl = currentTab?.url;
+  if (currentUrl) {
+    const cookies = await chrome.cookies.getAll({ url: currentUrl });
+    if (cookies.length !== 0) {
+      await chrome.action.setBadgeBackgroundColor({ color: '#a16207' });
+      await chrome.action.setBadgeText({ text: cookies.length.toString() });
+      return;
+    }
+  }
+  await chrome.action.setBadgeText({ text: '' });
 };
 
 chrome.tabs.onActivated.addListener(handler);

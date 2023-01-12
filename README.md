@@ -1,5 +1,4 @@
 # Cookie Man
-
 Cookie Manager for Chrome Extensions
 
 <a href='https://chrome.google.com/webstore/detail/cookie-man/hocmdfhjbhdgbfbkknpnindlbhaalmbe'>
@@ -10,9 +9,7 @@ Cookie Manager for Chrome Extensions
 </a>
 
 # Author
-
 [Taishi Naritomi](https://github.com/taishinaritomi)
 
 # License
-
 [MIT](https://github.com/taishinaritomi/cookie-man/blob/main/LICENSE)

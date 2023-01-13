@@ -4,7 +4,7 @@
   <div align="center">
     <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/assets/cookie-man-light.svg">
-    <img width="300" height="auto" alt="Cookie Man" src="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/assets/cookie-man-dark.svg">
+    <img width="450" height="auto" alt="Cookie Man" src="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/assets/cookie-man-dark.svg">
   </picture>
   </div>
   <br />

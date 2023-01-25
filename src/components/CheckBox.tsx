@@ -6,11 +6,11 @@ import { cls } from '@/utils/cls';
 export const CheckBox = (props: JSX.InputHTMLAttributes<HTMLInputElement>) => {
   const [checked, setChecked] = createSignal(props.checked || false);
   return (
-    <div class="flex items-center justify-center relative">
-      {checked() && <BsCheckLg class="absolute" size={14} color="#FFF" />}
+    <div class='flex items-center justify-center relative'>
+      {checked() && <BsCheckLg class='absolute' size={14} color='#FFF' />}
       <input
         {...props}
-        type="checkbox"
+        type='checkbox'
         checked={checked()}
         class={cls(
           'w-4 h-4 rounded',

@@ -64,11 +64,11 @@ export const CookieForm = (_props: {
   });
 
   return (
-    <div class="flex flex-col gap-6">
-      <div class="flex flex-col gap-3">
+    <div class='flex flex-col gap-6'>
+      <div class='flex flex-col gap-3'>
         {/* Name */}
-        <div class="flex flex-col gap-1">
-          <p class="px-2 font-bold text-sm">Name</p>
+        <div class='flex flex-col gap-1'>
+          <p class='px-2 font-bold text-sm'>Name</p>
           <TextBox
             ref={formRefs.name}
             placeholder={'unknown'}
@@ -77,27 +77,27 @@ export const CookieForm = (_props: {
         </div>
 
         {/* Value */}
-        <div class="w-full flex flex-col gap-1">
-          <p class="px-2 font-bold text-sm">Value</p>
+        <div class='w-full flex flex-col gap-1'>
+          <p class='px-2 font-bold text-sm'>Value</p>
           <textarea
             ref={formRefs.value}
-            class="w-full p-2 resize-none border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-            rows="3"
+            class='w-full p-2 resize-none border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800'
+            rows='3'
             value={decodeURIComponent(props.cookie.chromeCookie.value)}
           />
         </div>
 
         {/* Domain & Path */}
-        <div class="flex gap-2">
-          <div class="w-full flex flex-col gap-1">
-            <p class="px-2 font-bold text-sm">Domain</p>
+        <div class='flex gap-2'>
+          <div class='w-full flex flex-col gap-1'>
+            <p class='px-2 font-bold text-sm'>Domain</p>
             <TextBox
               ref={formRefs.domain}
               value={props.cookie.chromeCookie.domain}
             />
           </div>
-          <div class="w-full flex flex-col gap-1">
-            <p class="px-2 font-bold text-sm">Path</p>
+          <div class='w-full flex flex-col gap-1'>
+            <p class='px-2 font-bold text-sm'>Path</p>
             <TextBox
               ref={formRefs.path}
               value={props.cookie.chromeCookie.path}
@@ -106,8 +106,8 @@ export const CookieForm = (_props: {
         </div>
 
         {/* Expires / Max-Age */}
-        <div class="flex flex-col gap-1">
-          <p class="px-2 font-bold text-sm">Expires / Max-Age</p>
+        <div class='flex flex-col gap-1'>
+          <p class='px-2 font-bold text-sm'>Expires / Max-Age</p>
           <TextBox
             ref={formRefs.expiration}
             value={props.cookie.displayExpiration}
@@ -115,75 +115,75 @@ export const CookieForm = (_props: {
         </div>
 
         {/* SameSite */}
-        <div class="w-min">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <p class="font-bold text-sm">SameSite</p>
-            <div class="relative flex items-center justify-end">
-              <IoChevronDown class="absolute mr-2" size={12} />
+        <div class='w-min'>
+          <label class='flex items-center gap-2 cursor-pointer'>
+            <p class='font-bold text-sm'>SameSite</p>
+            <div class='relative flex items-center justify-end'>
+              <IoChevronDown class='absolute mr-2' size={12} />
               <select
                 ref={formRefs.sameSite}
                 value={props.cookie.chromeCookie.sameSite}
-                class="p-2 border cursor-pointer appearance-none pr-5 border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
-                name="sameSite"
+                class='p-2 border cursor-pointer appearance-none pr-5 border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800'
+                name='sameSite'
               >
-                <option value="unspecified">Unspecified</option>
-                <option value="no_restriction">No Restriction</option>
-                <option value="lax">Lax</option>
-                <option value="strict">Strict</option>
+                <option value='unspecified'>Unspecified</option>
+                <option value='no_restriction'>No Restriction</option>
+                <option value='lax'>Lax</option>
+                <option value='strict'>Strict</option>
               </select>
             </div>
           </label>
         </div>
 
         {/* CheckBox */}
-        <div class="flex gap-3">
-          <label class="flex items-center gap-1 hover:cursor-pointer">
+        <div class='flex gap-3'>
+          <label class='flex items-center gap-1 hover:cursor-pointer'>
             <CheckBox
               ref={formRefs.secure}
               checked={props.cookie.chromeCookie.secure}
             />
-            <p class="font-bold">Secure</p>
+            <p class='font-bold'>Secure</p>
           </label>
-          <label class="flex items-center gap-1 hover:cursor-pointer">
+          <label class='flex items-center gap-1 hover:cursor-pointer'>
             <CheckBox
               ref={formRefs.httpOnly}
               checked={props.cookie.chromeCookie.httpOnly}
             />
-            <p class="font-bold">HttpOnly</p>
+            <p class='font-bold'>HttpOnly</p>
           </label>
-          <label class="flex items-center gap-1 hover:cursor-pointer">
+          <label class='flex items-center gap-1 hover:cursor-pointer'>
             <CheckBox
               ref={formRefs.hostOnly}
               checked={props.cookie.chromeCookie.hostOnly}
             />
-            <p class="font-bold">HostOnly</p>
+            <p class='font-bold'>HostOnly</p>
           </label>
-          <label class="flex items-center gap-1 hover:cursor-pointer">
+          <label class='flex items-center gap-1 hover:cursor-pointer'>
             <CheckBox
               ref={formRefs.session}
               checked={props.cookie.chromeCookie.session}
             />
-            <p class="font-bold">Session</p>
+            <p class='font-bold'>Session</p>
           </label>
         </div>
       </div>
-      <div class="flex justify-between items-center">
+      <div class='flex justify-between items-center'>
         <div>
           {props.isRemove && (
             <button
               onClick={() => props.onRemove?.()}
-              class="p-2 border block border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 transition-colors hover:bg-slate-200 dark:hover:bg-slate-900"
+              class='p-2 border block border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 transition-colors hover:bg-slate-200 dark:hover:bg-slate-900'
             >
-              <div class="flex items-center justify-center h-5 w-5">
+              <div class='flex items-center justify-center h-5 w-5'>
                 {<IoTrash size={16} />}
               </div>
             </button>
           )}
         </div>
-        <div class="flex items-center gap-2">
+        <div class='flex items-center gap-2'>
           <button
             onClick={() => props.onCancel()}
-            class="px-6 py-2 text-sm font-bold border border-slate-300 dark:border-slate-600 rounded transition-colors hover:bg-slate-200 bg-white dark:bg-slate-800 dark:hover:bg-slate-900"
+            class='px-6 py-2 text-sm font-bold border border-slate-300 dark:border-slate-600 rounded transition-colors hover:bg-slate-200 bg-white dark:bg-slate-800 dark:hover:bg-slate-900'
           >
             Cancel
           </button>

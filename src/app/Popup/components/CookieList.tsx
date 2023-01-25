@@ -22,7 +22,7 @@ initCookies();
 export const CookieList = () => {
   return (
     <Accordion
-      class="flex gap-3 flex-col"
+      class='flex gap-3 flex-col'
       defaultValue={cookies()?.[0]}
       toggleable={true}
       multiple={true}
@@ -36,8 +36,8 @@ export const CookieList = () => {
 
 const NoCookie = () => {
   return (
-    <div class="flex items-center justify-center my-8">
-      <p class="text-sm font-bold">No Cookie</p>
+    <div class='flex items-center justify-center my-8'>
+      <p class='text-sm font-bold'>No Cookie</p>
     </div>
   );
 };
@@ -66,7 +66,7 @@ const CookieItem = (_props: { cookie: Cookie }) => {
     >
       {/* virtual AccordionButton use onCancel */}
       <AccordionButton
-        class="hidden"
+        class='hidden'
         ref={accordionRefs.button}
       ></AccordionButton>
       <AccordionHeader>
@@ -78,7 +78,7 @@ const CookieItem = (_props: { cookie: Cookie }) => {
               isSelected() && 'rounded-b-none',
             )}
           >
-            <div class="flex gap-2 items-center">
+            <div class='flex gap-2 items-center'>
               <IoChevronDown
                 size={16}
                 class={cls(
@@ -86,7 +86,7 @@ const CookieItem = (_props: { cookie: Cookie }) => {
                   isSelected() && 'transform rotate-0',
                 )}
               />
-              <div class="flex flex-col gap-1 text-left items-start">
+              <div class='flex flex-col gap-1 text-left items-start'>
                 <p
                   class={cls(
                     'font-bold text-base pl-1',
@@ -95,7 +95,7 @@ const CookieItem = (_props: { cookie: Cookie }) => {
                 >
                   {props.cookie.chromeCookie.name || 'unknown'}
                 </p>
-                <p class="text-white bg-purple-500 rounded-full px-2 mb-1 shadow">
+                <p class='text-white bg-purple-500 rounded-full px-2 mb-1 shadow'>
                   {props.cookie.displayUrl}
                 </p>
               </div>

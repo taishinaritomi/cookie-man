@@ -35,7 +35,7 @@ export const AddCookie = () => {
 const AddCookiePanel = () => {
   const defaultCookie = getDefaultCookie();
   return (
-    <div class="border p-3 border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700">
+    <div class='border p-3 border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700'>
       <CookieForm
         cookie={defaultCookie}
         isRemove={false}

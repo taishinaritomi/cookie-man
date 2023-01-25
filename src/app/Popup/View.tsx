@@ -4,7 +4,7 @@ import { Header } from './components/Header';
 
 export const PopupView = () => {
   return (
-    <div class="w-[400px] p-2 flex flex-col gap-2">
+    <div class='w-[400px] p-2 flex flex-col gap-2'>
       <Header />
       <AddCookie />
       <CookieList />

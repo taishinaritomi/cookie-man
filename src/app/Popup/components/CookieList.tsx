@@ -89,7 +89,7 @@ const CookieItem = (_props: { cookie: Cookie }) => {
               <div class='flex flex-col gap-1 text-left items-start'>
                 <p
                   class={cls(
-                    'font-bold text-base pl-1',
+                    'font-bold text-base pl-1 truncate w-80',
                     props.cookie.chromeCookie.name ? '' : 'opacity-50',
                   )}
                 >

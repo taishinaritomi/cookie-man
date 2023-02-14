@@ -28,3 +28,4 @@ const manifest = defineManifest({
 export default defineConfig({
   plugins: [tsconfigPaths(), solidPlugin(), crx({ manifest })],
 });
+

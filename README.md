@@ -21,6 +21,7 @@
     </a>
   </div>
   <br />
+      <img src="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/assets/screenshot.png">
 </div>
 
 # Author

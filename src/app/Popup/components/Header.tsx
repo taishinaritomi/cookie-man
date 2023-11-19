@@ -1,55 +1,82 @@
-import { CgSpinner } from 'solid-icons/cg';
-import { IoAdd, IoRefresh, IoSearch } from 'solid-icons/io';
-import { createSignal } from 'solid-js';
-import {
-  reloadCookies,
-  searchInput,
-  setIsOpenAddCookie,
-  setSearchInput,
-} from '../states/cookie';
+import { IoAdd, IoSearch } from "solid-icons/io";
+import { Match, Switch, createSignal } from "solid-js";
+import { useCookie } from "../providers/cookie";
+import { CookieForm } from "./CookieForm";
 
-export const Header = () => {
+export function Header() {
+  const [open, setOpen] = createSignal<"ADD_COOKIE" | "SEARCH" | undefined>(
+    undefined,
+  );
+
+  const { searchCookie } = useCookie();
+
   return (
-    <header class='flex justify-between items-center p-1'>
-      <p class='text-xl font-bold italic'></p>
-      <HeaderRight />
+    <header class="flex flex-col gap-3">
+      <HeaderTop
+        onCreate={() =>
+          setOpen((open) => (open === "ADD_COOKIE" ? undefined : "ADD_COOKIE"))
+        }
+        onSearch={() =>
+          setOpen((open) => (open === "SEARCH" ? undefined : "SEARCH"))
+        }
+      />
+      <Switch>
+        <Match when={open() === "ADD_COOKIE"}>
+          <CreateCookie close={() => setOpen(undefined)} />
+        </Match>
+        <Match when={open() === "SEARCH"}>
+          <input
+            onInput={async (e) => searchCookie(e.currentTarget.value)}
+            type="text"
+            placeholder="Search cookies"
+            class="p-2 px-3 border leading-4 box-content  border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700 font-bold"
+          />
+        </Match>
+      </Switch>
     </header>
   );
-};
+}
 
-const HeaderRight = () => {
-  const [lording, setLording] = createSignal(false);
+function HeaderTop(props: { onSearch: () => void; onCreate: () => void }) {
+  const { currentURL, changeCurrentURL } = useCookie();
   return (
-    <div class='flex items-center gap-2'>
-      <div class='relative flex items-center justify-end'>
-        <IoSearch size={16} class='absolute mr-2' />
-        <input
-          value={searchInput() || ''}
-          onInput={async (e) => setSearchInput(e.currentTarget.value)}
-          type='text'
-          class='p-2 border leading-4 box-content min-w-[200px] border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700'
-        />
-      </div>
+    <div class="flex items-center gap-2">
+      <input
+        value={currentURL() || ""}
+        onInput={async (e) => changeCurrentURL(e.currentTarget.value)}
+        type="text"
+        class="p-2 px-3 border leading-4 w-full box-content  border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700 font-bold"
+      />
+
       <button
-        onClick={async () => setIsOpenAddCookie((b) => !b)}
-        class='p-2 border block border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700'
+        onClick={async () => props.onCreate()}
+        class="p-2 border block border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700"
       >
         <IoAdd size={16} />
       </button>
       <button
-        onClick={async () => {
-          setLording(true);
-          await reloadCookies();
-          setLording(false);
-        }}
-        class='p-2 border block border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700'
+        onClick={async () => props.onSearch()}
+        class="p-2 border block border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700"
       >
-        {lording() ? (
-          <CgSpinner size={16} class='animate-[spin_.5s_linear_infinite]' />
-        ) : (
-          <IoRefresh size={16} />
-        )}
+        <IoSearch size={16} />
       </button>
     </div>
   );
-};
+}
+
+function CreateCookie(props: { close: () => void }) {
+  const { defaultCookie, createCookie } = useCookie();
+  return (
+    <div class="border p-3 border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700">
+      <CookieForm
+        cookie={defaultCookie()}
+        isRemove={false}
+        onSave={(newCookie) => {
+          createCookie(newCookie);
+          props.close();
+        }}
+        onCancel={() => props.close()}
+      />
+    </div>
+  );
+}

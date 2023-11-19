@@ -1,13 +1,14 @@
-import { AddCookie } from './components/AddCookie';
-import { CookieList } from './components/CookieList';
-import { Header } from './components/Header';
+import { CookieList } from "./components/CookieList";
+import { Header } from "./components/Header";
+import { CookieProvider } from "./providers/cookie";
 
-export const PopupView = () => {
+export function PopupView() {
   return (
-    <div class='w-[400px] p-2 flex flex-col gap-2'>
-      <Header />
-      <AddCookie />
-      <CookieList />
-    </div>
+    <CookieProvider>
+      <div class="w-[400px] p-2 pt-3 flex flex-col gap-3 pr-1">
+        <Header />
+        <CookieList />
+      </div>
+    </CookieProvider>
   );
-};
+}

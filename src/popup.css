@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html {
-  overflow-y: overlay;
+  scrollbar-gutter: stable;
 }
 
 :root {
@@ -22,7 +22,7 @@ select {
 }
 
 ::-webkit-scrollbar {
-  width: 3px;
+  @apply w-1;
 }
 
 ::-webkit-scrollbar-thumb {

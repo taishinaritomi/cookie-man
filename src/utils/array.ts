@@ -3,5 +3,5 @@ export const alphabetSort = <T, K extends keyof T>(k: K) => {
 };
 
 export const booleanSort = <T, K extends keyof T>(k: K) => {
-  return (A: T, B: T) => Number(B[k]) - Number(A[k]);
+  return (a: T, b: T) => Number(b[k]) - Number(a[k]);
 };

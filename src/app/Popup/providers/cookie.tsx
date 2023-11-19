@@ -7,7 +7,7 @@ import { unixTimeToDate } from "@/utils/date";
 export type Cookie = {
   match: boolean;
   searchName: string;
-  displayUrl: string;
+  displayURL: string;
   displayExpiration: string;
   chromeCookie: chrome.cookies.Cookie;
 };
@@ -33,12 +33,12 @@ function formatCookie(chromeCookie: chrome.cookies.Cookie): Cookie {
   const displayExpiration = chromeCookie.session
     ? "Session"
     : unixTimeToDate(chromeCookie.expirationDate || 0).toISOString();
-  const displayUrl = chromeCookie.hostOnly
+  const displayURL = chromeCookie.hostOnly
     ? createCookieURL(chromeCookie)
     : createCookieURL(chromeCookie).replace("://.", "://*.");
   return {
     chromeCookie,
-    displayUrl,
+    displayURL,
     displayExpiration,
     match: false,
     searchName: chromeCookie.name.toLowerCase(),
@@ -162,7 +162,7 @@ export function CookieProvider(props: { children: JSX.Element }) {
               session: true,
             },
             displayExpiration: "Session",
-            displayUrl: "",
+            displayURL: "",
             match: false,
             searchName: "",
           };

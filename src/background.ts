@@ -3,9 +3,9 @@ const handler = async () => {
     active: true,
     currentWindow: true,
   });
-  const currentUrl = currentTab?.url;
-  if (currentUrl) {
-    const cookies = await chrome.cookies.getAll({ url: currentUrl });
+  const currentURL = currentTab?.url;
+  if (currentURL) {
+    const cookies = await chrome.cookies.getAll({ url: currentURL });
     if (cookies.length !== 0) {
       await chrome.action.setBadgeBackgroundColor({ color: "#a16207" });
       await chrome.action.setBadgeText({ text: cookies.length.toString() });

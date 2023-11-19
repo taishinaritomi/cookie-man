@@ -92,7 +92,7 @@ function CookieItem(_props: { cookie: Cookie }) {
                 </p>
 
                 <p class="truncate text-white bg-purple-500 rounded-full px-2 mb-1 shadow w-fit">
-                  {props.cookie.displayUrl}
+                  {props.cookie.displayURL}
                 </p>
               </div>
             </div>

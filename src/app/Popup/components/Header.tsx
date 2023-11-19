@@ -11,7 +11,7 @@ export function Header() {
   const { searchCookie } = useCookie();
 
   return (
-    <header class="flex flex-col gap-3">
+    <header class="flex flex-col gap-2">
       <HeaderTop
         onCreate={() =>
           setOpen((open) => (open === "ADD_COOKIE" ? undefined : "ADD_COOKIE"))

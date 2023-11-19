@@ -16,7 +16,7 @@ export function CookieList() {
   const { cookies } = useCookie();
   return (
     <Accordion
-      class="flex gap-3 flex-col"
+      class="flex gap-2 flex-col"
       defaultValue={cookies()?.[0]}
       toggleable={true}
       multiple={true}

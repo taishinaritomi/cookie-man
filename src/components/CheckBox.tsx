@@ -6,7 +6,7 @@ import { cls } from "@/utils/cls";
 export const CheckBox = (props: JSX.InputHTMLAttributes<HTMLInputElement>) => {
   const [checked, setChecked] = createSignal(props.checked || false);
   return (
-    <div class="flex items-center justify-center relative">
+    <div class="relative flex items-center justify-center">
       {checked() && <BsCheckLg class="absolute" size={14} color="#FFF" />}
       <input
         {...props}

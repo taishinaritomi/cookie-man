@@ -4,13 +4,13 @@ import { alphabetSort, booleanSort } from "@/utils/array";
 import { createCookieURL } from "@/utils/chrome";
 import { unixTimeToDate } from "@/utils/date";
 
-export type Cookie = {
+export interface Cookie {
   match: boolean;
   searchName: string;
   displayURL: string;
   displayExpiration: string;
   chromeCookie: chrome.cookies.Cookie;
-};
+}
 
 export type CookieSameSite = chrome.cookies.Cookie["sameSite"];
 
@@ -81,7 +81,9 @@ export function CookieProvider(props: { children: JSX.Element }) {
             return sortCookies(
               chromeCookies.map((chromeCookie) => formatCookie(chromeCookie)),
             );
-          } catch {}
+          } catch {
+            return [];
+          }
         }
         return [];
       },

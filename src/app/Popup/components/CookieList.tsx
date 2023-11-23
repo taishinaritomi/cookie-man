@@ -16,7 +16,7 @@ export function CookieList() {
   const { cookies } = useCookie();
   return (
     <Accordion
-      class="flex gap-2 flex-col"
+      class="flex flex-col gap-2"
       defaultValue={cookies()?.[0]}
       toggleable={true}
       multiple={true}
@@ -30,15 +30,15 @@ export function CookieList() {
 
 function NoCookie() {
   return (
-    <div class="flex items-center justify-center my-8">
+    <div class="my-8 flex items-center justify-center">
       <p class="text-sm font-bold">No Cookie</p>
     </div>
   );
 }
 
-type AccordionRefs = {
+interface AccordionRefs {
   button: HTMLButtonElement;
-};
+}
 
 function CookieItem(_props: { cookie: Cookie }) {
   const { updateCookie, removeCookie } = useCookie();
@@ -73,7 +73,7 @@ function CookieItem(_props: { cookie: Cookie }) {
               isSelected() && "rounded-b-none",
             )}
           >
-            <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-2">
               <IoChevronDown
                 size={16}
                 class={cls(
@@ -81,7 +81,7 @@ function CookieItem(_props: { cookie: Cookie }) {
                   isSelected() && "transform rotate-0",
                 )}
               />
-              <div class="flex flex-col gap-1 text-left overflow-hidden">
+              <div class="flex flex-col gap-1 overflow-hidden text-left">
                 <p
                   class={cls(
                     "font-bold text-base pl-1 truncate",
@@ -91,7 +91,7 @@ function CookieItem(_props: { cookie: Cookie }) {
                   {props.cookie.chromeCookie.name || "unknown"}
                 </p>
 
-                <p class="truncate text-white bg-purple-500 rounded-full px-2 mb-1 shadow w-fit">
+                <p class="mb-1 w-fit truncate rounded-full bg-purple-500 px-2 text-white shadow">
                   {props.cookie.displayURL}
                 </p>
               </div>

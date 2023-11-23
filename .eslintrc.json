@@ -1,5 +1,11 @@
 {
-  "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/stylistic",
+    "plugin:tailwindcss/recommended",
+    "prettier"
+  ],
   "plugins": ["import", "unused-imports"],
   "rules": {
     "@typescript-eslint/no-unused-vars": "off",
@@ -10,7 +16,11 @@
   },
   "overrides": [
     {
-      "files": ["./vite.config.ts"],
+      "files": [
+        "./vite.config.ts",
+        "./postcss.config.js",
+        "./tailwind.config.js"
+      ],
       "rules": {
         "import/no-default-export": "off",
         "import/prefer-default-export": "error"

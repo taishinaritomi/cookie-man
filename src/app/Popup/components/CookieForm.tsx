@@ -7,7 +7,7 @@ import { TextBox } from "@/components/TextBox";
 import { cls } from "@/utils/cls";
 import { dateToUnixTime } from "@/utils/date";
 
-type FormRefs = {
+interface FormRefs {
   name: HTMLInputElement;
   value: HTMLTextAreaElement;
   domain: HTMLInputElement;
@@ -18,7 +18,7 @@ type FormRefs = {
   hostOnly: HTMLInputElement;
   session: HTMLInputElement;
   secure: HTMLInputElement;
-};
+}
 
 export function CookieForm(_props: {
   cookie: Cookie;
@@ -64,7 +64,7 @@ export function CookieForm(_props: {
       <div class="flex flex-col gap-3">
         {/* Name */}
         <div class="flex flex-col gap-1">
-          <p class="px-2 font-bold text-sm">Name</p>
+          <p class="px-2 text-sm font-bold">Name</p>
           <TextBox
             ref={formRefs.name}
             placeholder={"unknown"}
@@ -73,11 +73,11 @@ export function CookieForm(_props: {
         </div>
 
         {/* Value */}
-        <div class="w-full flex flex-col gap-1">
-          <p class="px-2 font-bold text-sm">Value</p>
+        <div class="flex w-full flex-col gap-1">
+          <p class="px-2 text-sm font-bold">Value</p>
           <textarea
             ref={formRefs.value}
-            class="w-full p-2 resize-none border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
+            class="w-full resize-none rounded border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-800"
             rows="3"
             value={decodeURIComponent(props.cookie.chromeCookie.value)}
           />
@@ -85,15 +85,15 @@ export function CookieForm(_props: {
 
         {/* Domain & Path */}
         <div class="flex gap-2">
-          <div class="w-full flex flex-col gap-1">
-            <p class="px-2 font-bold text-sm">Domain</p>
+          <div class="flex w-full flex-col gap-1">
+            <p class="px-2 text-sm font-bold">Domain</p>
             <TextBox
               ref={formRefs.domain}
               value={props.cookie.chromeCookie.domain}
             />
           </div>
-          <div class="w-full flex flex-col gap-1">
-            <p class="px-2 font-bold text-sm">Path</p>
+          <div class="flex w-full flex-col gap-1">
+            <p class="px-2 text-sm font-bold">Path</p>
             <TextBox
               ref={formRefs.path}
               value={props.cookie.chromeCookie.path}
@@ -103,7 +103,7 @@ export function CookieForm(_props: {
 
         {/* Expires / Max-Age */}
         <div class="flex flex-col gap-1">
-          <p class="px-2 font-bold text-sm">Expires / Max-Age</p>
+          <p class="px-2 text-sm font-bold">Expires / Max-Age</p>
           <TextBox
             ref={formRefs.expiration}
             value={props.cookie.displayExpiration}
@@ -112,14 +112,14 @@ export function CookieForm(_props: {
 
         {/* SameSite */}
         <div class="w-min">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <p class="font-bold text-sm">SameSite</p>
+          <label class="flex cursor-pointer items-center gap-2">
+            <p class="text-sm font-bold">SameSite</p>
             <div class="relative flex items-center justify-end">
               <IoChevronDown class="absolute mr-2" size={12} />
               <select
                 ref={formRefs.sameSite}
                 value={props.cookie.chromeCookie.sameSite}
-                class="p-2 border cursor-pointer appearance-none pr-5 border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
+                class="cursor-pointer appearance-none rounded border border-slate-300 bg-white p-2 pr-5 dark:border-slate-600 dark:bg-slate-800"
                 name="sameSite"
               >
                 <option value="unspecified">Unspecified</option>
@@ -163,14 +163,14 @@ export function CookieForm(_props: {
           </label>
         </div>
       </div>
-      <div class="flex justify-between items-center">
+      <div class="flex items-center justify-between">
         <div>
           {props.isRemove && (
             <button
               onClick={() => props.onRemove?.()}
-              class="p-2 border block border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 transition-colors hover:bg-slate-200 dark:hover:bg-slate-900"
+              class="block rounded border border-slate-300 bg-white p-2 transition-colors hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-900"
             >
-              <div class="flex items-center justify-center h-5 w-5">
+              <div class="flex h-5 w-5 items-center justify-center">
                 {<IoTrash size={16} />}
               </div>
             </button>
@@ -179,7 +179,7 @@ export function CookieForm(_props: {
         <div class="flex items-center gap-2">
           <button
             onClick={() => props.onCancel()}
-            class="px-6 py-2 text-sm font-bold border border-slate-300 dark:border-slate-600 rounded transition-colors hover:bg-slate-200 bg-white dark:bg-slate-800 dark:hover:bg-slate-900"
+            class="rounded border border-slate-300 bg-white px-6 py-2 text-sm font-bold transition-colors hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-900"
           >
             Cancel
           </button>

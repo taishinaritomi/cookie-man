@@ -1,4 +1,5 @@
 import { crx, defineManifest } from "@crxjs/vite-plugin";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import packageJson from "./package.json";
@@ -25,5 +26,16 @@ const manifest = defineManifest({
 });
 
 export default defineConfig({
-  plugins: [tsconfigPaths(), crx({ manifest })],
+  build: {
+    minify: false,
+  },
+  plugins: [
+    tsconfigPaths(),
+    crx({ manifest }),
+    react({
+      babel: {
+        plugins: [["babel-plugin-react-compiler", {}]],
+      },
+    }),
+  ],
 });

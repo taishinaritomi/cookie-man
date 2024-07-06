@@ -4,8 +4,8 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "vite --watch build",
-    "build": "NODE_ENV=development vite build  --mode development && zip -r dist.zip dist/",
+    "dev": "NODE_ENV=development  vite --watch   --mode development  build",
+    "build": "vite build && zip -r dist.zip dist/",
     "fix": "biome check --write .",
     "check": "biome check . && tsc --noEmit"
   },
@@ -24,7 +24,9 @@
     "@types/chrome": "^0.0.268",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
+    "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
+    "babel-plugin-react-compiler": "0.0.0-experimental-696af53-20240625",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.38",
     "prettier": "^3.3.2",

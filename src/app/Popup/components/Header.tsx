@@ -32,9 +32,7 @@ export function Header() {
 
         <button
           type="button"
-          onClick={async () => {
-            setOpen((open) => (open === Open.Add ? Open.None : Open.Add));
-          }}
+          onClick={async () => toggleOpen(Open.Add)}
           className="block rounded border border-slate-300 bg-slate-100 p-2 dark:border-slate-600 dark:bg-slate-700"
         >
           <div className="size-4 i-ph-plus" />

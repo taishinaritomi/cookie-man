@@ -1,5 +1,9 @@
 import { alphabetSort, booleanSort } from "@/utils/array";
-import { createCookieURL, getCurrentURL } from "@/utils/chrome";
+import {
+  generateCookieURL,
+  generatePrettyCookieURL,
+  getCurrentURL,
+} from "@/utils/chrome";
 import { unixTimeToDate } from "@/utils/date";
 import {
   type PropsWithChildren,
@@ -33,7 +37,7 @@ function formatCookie(chromeCookie: chrome.cookies.Cookie): Cookie {
   return {
     id: crypto.randomUUID(),
     chromeCookie,
-    displayURL: createCookieURL(chromeCookie),
+    displayURL: generatePrettyCookieURL(chromeCookie),
     displayExpiration,
     match: false,
     searchName: chromeCookie.name.toLowerCase(),
@@ -130,7 +134,7 @@ export function CookieProvider(props: PropsWithChildren) {
 
   const formattedCookies = useMemo(
     () => _cookies.map(formatCookie),
-    [_cookies],
+    [_cookies]
   );
 
   const cookies = useMemo(() => {
@@ -175,7 +179,7 @@ export function CookieProvider(props: PropsWithChildren) {
 
   async function updateCookie(cookie: Cookie, setCookie: SetCookie) {
     await chrome.cookies.remove({
-      url: createCookieURL(cookie.chromeCookie),
+      url: generateCookieURL(cookie.chromeCookie),
       name: cookie.chromeCookie.name,
       storeId: cookie.chromeCookie.storeId,
     });
@@ -184,7 +188,7 @@ export function CookieProvider(props: PropsWithChildren) {
 
   async function removeCookie(cookie: Cookie) {
     await chrome.cookies.remove({
-      url: createCookieURL(cookie.chromeCookie),
+      url: generateCookieURL(cookie.chromeCookie),
       name: cookie.chromeCookie.name,
       storeId: cookie.chromeCookie.storeId,
     });

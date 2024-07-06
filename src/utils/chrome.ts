@@ -4,6 +4,11 @@
 */
 export function createCookieURL(chromeCookie: chrome.cookies.Cookie) {
   const protocol = chromeCookie.secure ? "https:" : "http:";
+
+  if (!chromeCookie.hostOnly && chromeCookie.domain.startsWith(".")) {
+    return `${protocol}//*${chromeCookie.domain}${chromeCookie.path}`;
+  }
+
   return `${protocol}//${chromeCookie.domain}${chromeCookie.path}`;
 }
 

@@ -1,6 +1,5 @@
 import { crx, defineManifest } from "@crxjs/vite-plugin";
 import { defineConfig } from "vite";
-import solidPlugin from "vite-plugin-solid";
 import tsconfigPaths from "vite-tsconfig-paths";
 import packageJson from "./package.json";
 
@@ -26,5 +25,5 @@ const manifest = defineManifest({
 });
 
 export default defineConfig({
-  plugins: [tsconfigPaths(), solidPlugin(), crx({ manifest })],
+  plugins: [tsconfigPaths(), crx({ manifest })],
 });

@@ -1,6 +1,6 @@
-export const cls = (...classNames: unknown[]) => {
+export function cls(...classNames: unknown[]) {
   return classNames
     .filter((className) => typeof className === "string")
     .join(" ")
     .trim();
-};
+}

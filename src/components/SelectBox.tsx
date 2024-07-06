@@ -1,22 +1,24 @@
-import { IoChevronDown } from "solid-icons/io";
-import type { JSX } from "solid-js";
-import { Index } from "solid-js";
+import type { ComponentProps } from "react";
 
-interface Props {
-  selectProps: JSX.InputHTMLAttributes<HTMLSelectElement>;
+type Props = {
   options: string[];
-}
+} & ComponentProps<"select">;
 
-export const SelectBox = (props: Props) => {
-  <label class="relative flex items-center justify-end">
-    <IoChevronDown class="absolute mr-2" size={12} />
+export const SelectBox = (_props: Props) => {
+  const { options, ...props } = _props;
+  <label className="relative flex items-center justify-end">
+    <div className="i-ph-tag-chevron size-3" />
     <select
-      class="appearance-none rounded border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-800"
-      {...props.selectProps}
+      className="appearance-none rounded border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-800"
+      {...props}
     >
-      <Index each={props.options} fallback={null}>
-        {(option) => <option value={option()}>{option()}</option>}
-      </Index>
+      {options.map((option) => {
+        return (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        );
+      })}
     </select>
   </label>;
 };

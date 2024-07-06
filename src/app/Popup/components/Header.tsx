@@ -1,69 +1,74 @@
-import { IoAdd, IoEllipsisVertical } from "solid-icons/io";
-import { Match, Switch, createSignal } from "solid-js";
+import { useState } from "react";
 import { useCookie } from "../providers/cookie";
 import { CookieForm } from "./CookieForm";
 
+const Open = { None: 0, Add: 1, Search: 2 } as const;
+type Open = (typeof Open)[keyof typeof Open];
+
 export function Header() {
-  const [open, setOpen] = createSignal<"ADD" | "SEARCH" | undefined>(undefined);
+  const [open, setOpen] = useState<Open>(Open.None);
 
   const {
-    searchCookie,
     defaultCookie,
     createCookie,
     currentURL,
-    changeCurrentURL,
+    setCurrentURL,
+    setSearchText,
   } = useCookie();
 
+  function toggleOpen(open: Open) {
+    setOpen((current) => (current === open ? Open.None : open));
+  }
+
   return (
-    <header class="flex flex-col gap-2">
-      <div class="flex items-center gap-2">
+    <header className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
         <input
-          value={currentURL() || ""}
-          onInput={async (e) => changeCurrentURL(e.currentTarget.value)}
+          value={currentURL}
+          onChange={(e) => setCurrentURL(e.currentTarget.value)}
           type="text"
-          class="box-content w-full rounded border border-slate-300  bg-slate-100 p-2 font-bold leading-4 dark:border-slate-600 dark:bg-slate-700"
+          className="box-content w-full rounded border border-slate-300  bg-slate-100 p-2 font-bold leading-4 dark:border-slate-600 dark:bg-slate-700"
         />
 
         <button
+          type="button"
           onClick={async () => {
-            setOpen((open) => (open === "ADD" ? undefined : "ADD"));
+            setOpen((open) => (open === Open.Add ? Open.None : Open.Add));
           }}
-          class="block rounded border border-slate-300 bg-slate-100 p-2 dark:border-slate-600 dark:bg-slate-700"
+          className="block rounded border border-slate-300 bg-slate-100 p-2 dark:border-slate-600 dark:bg-slate-700"
         >
-          <IoAdd size={16} />
+          <div className="size-4 i-ph-plus" />
         </button>
         <button
-          onClick={async () => {
-            setOpen((open) => (open === "SEARCH" ? undefined : "SEARCH"));
-          }}
-          class="block rounded border border-slate-300 bg-slate-100 p-2 dark:border-slate-600 dark:bg-slate-700"
+          type="button"
+          onClick={() => toggleOpen(Open.Search)}
+          className="block rounded border border-slate-300 bg-slate-100 p-2 dark:border-slate-600 dark:bg-slate-700"
         >
-          <IoEllipsisVertical size={16} />
+          <div className="size-4 i-ph-bell-ringing" />
         </button>
       </div>
-      <Switch>
-        <Match when={open() === "ADD"}>
-          <div class="rounded border border-slate-300 bg-slate-100 p-3 dark:border-slate-600 dark:bg-slate-700">
-            <CookieForm
-              cookie={defaultCookie()}
-              isRemove={false}
-              onSave={(newCookie) => {
-                createCookie(newCookie);
-                setOpen(undefined);
-              }}
-              onCancel={() => setOpen(undefined)}
-            />
-          </div>
-        </Match>
-        <Match when={open() === "SEARCH"}>
-          <input
-            onInput={async (e) => searchCookie(e.currentTarget.value)}
-            type="text"
-            placeholder="Search cookies"
-            class="box-content rounded border border-slate-300 bg-slate-100 p-2 font-bold leading-4 dark:border-slate-600 dark:bg-slate-700"
+      {open === Open.Add && (
+        <div className="rounded border border-slate-300 bg-slate-100 p-3 dark:border-slate-600 dark:bg-slate-700">
+          <CookieForm
+            cookie={defaultCookie}
+            isRemove={false}
+            onSave={(newCookie) => {
+              createCookie(newCookie);
+              setOpen(Open.None);
+            }}
+            onCancel={() => setOpen(Open.None)}
           />
-        </Match>
-      </Switch>
+        </div>
+      )}
+
+      {open === Open.Search && (
+        <input
+          onInput={async (e) => setSearchText(e.currentTarget.value)}
+          type="text"
+          placeholder="Search cookies"
+          className="box-content rounded border border-slate-300 bg-slate-100 p-2 font-bold leading-4 dark:border-slate-600 dark:bg-slate-700"
+        />
+      )}
     </header>
   );
 }

@@ -1,15 +1,15 @@
-import type { JSX } from "solid-js";
 import { cls } from "@/utils/cls";
+import type { ComponentProps } from "react";
 
-export const TextBox = (props: JSX.InputHTMLAttributes<HTMLInputElement>) => {
+export function TextBox(props: ComponentProps<"input">) {
   return (
     <input
       {...props}
       type="text"
-      class={cls(
+      className={cls(
         "w-full p-2 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800",
-        props.class,
+        props.className,
       )}
     />
   );
-};
+}

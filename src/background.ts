@@ -1,4 +1,4 @@
-const handler = async () => {
+async function handler() {
   const [currentTab] = await chrome.tabs.query({
     active: true,
     currentWindow: true,
@@ -13,7 +13,7 @@ const handler = async () => {
     }
   }
   await chrome.action.setBadgeText({ text: "" });
-};
+}
 
 chrome.tabs.onActivated.addListener(handler);
 chrome.cookies.onChanged.addListener(handler);

@@ -1,125 +1,121 @@
-import { IoChevronDown, IoTrash } from "solid-icons/io";
-import { createSignal, mergeProps, onMount } from "solid-js";
-import type { Cookie, CookieSameSite, SetCookie } from "../providers/cookie";
-import { useCookie } from "../providers/cookie";
 import { CheckBox } from "@/components/CheckBox";
 import { TextBox } from "@/components/TextBox";
 import { cls } from "@/utils/cls";
 import { dateToUnixTime } from "@/utils/date";
+import { useRef } from "react";
+import type { Cookie, CookieSameSite, SetCookie } from "../providers/cookie";
+import { useCookie } from "../providers/cookie";
 
-interface FormRefs {
-  name: HTMLInputElement;
-  value: HTMLTextAreaElement;
-  domain: HTMLInputElement;
-  path: HTMLInputElement;
-  expiration: HTMLInputElement;
-  sameSite: HTMLSelectElement;
-  httpOnly: HTMLInputElement;
-  hostOnly: HTMLInputElement;
-  session: HTMLInputElement;
-  secure: HTMLInputElement;
-}
-
-export function CookieForm(_props: {
+export function CookieForm(props: {
   cookie: Cookie;
   onSave: (c: SetCookie) => void;
   onCancel: () => void;
   isRemove?: boolean;
   onRemove?: () => void;
 }) {
-  const props = mergeProps({ isRemove: true }, _props);
-  const formRefs = {} as FormRefs;
+  const isRemove = props.isRemove || false;
 
-  const [changed, setChanged] = createSignal(false);
   const { currentURL } = useCookie();
 
-  const onSave = () => {
-    props.onSave({
-      url: currentURL() || "",
-      name: formRefs.name.value || undefined,
-      value: encodeURIComponent(formRefs.value.value) || undefined,
-      path: formRefs.path.value || undefined,
-      domain: formRefs.domain.value || undefined,
-      expirationDate:
-        dateToUnixTime(new Date(formRefs.expiration?.value)) || undefined,
-      storeId: props.cookie.chromeCookie.storeId,
-      secure: formRefs.hostOnly.checked,
-      httpOnly: formRefs.httpOnly.checked,
-      sameSite: formRefs.sameSite.value as CookieSameSite,
-      ...(formRefs.hostOnly.checked ? { domain: undefined } : undefined),
-      ...(formRefs.session.checked ? { expirationDate: undefined } : undefined),
-    });
-  };
+  const nameRef = useRef<HTMLInputElement>(null);
+  const valueRef = useRef<HTMLTextAreaElement>(null);
+  const domainRef = useRef<HTMLInputElement>(null);
+  const pathRef = useRef<HTMLInputElement>(null);
+  const expirationRef = useRef<HTMLInputElement>(null);
+  const sameSiteRef = useRef<HTMLSelectElement>(null);
+  const httpOnlyRef = useRef<HTMLInputElement>(null);
+  const hostOnlyRef = useRef<HTMLInputElement>(null);
+  const sessionRef = useRef<HTMLInputElement>(null);
+  const secureRef = useRef<HTMLInputElement>(null);
 
-  onMount(() => {
-    for (const key in formRefs) {
-      const ref = formRefs[key as keyof typeof formRefs];
-      ref.addEventListener("change", () => setChanged(true));
-      ref.addEventListener("input", () => setChanged(true));
+  function onSave() {
+    if (
+      nameRef.current &&
+      valueRef.current &&
+      domainRef.current &&
+      pathRef.current &&
+      expirationRef.current &&
+      sameSiteRef.current &&
+      httpOnlyRef.current &&
+      hostOnlyRef.current &&
+      sessionRef.current &&
+      secureRef.current
+    ) {
+      props.onSave({
+        url: currentURL || "",
+        name: nameRef.current.value || undefined,
+        value: encodeURIComponent(valueRef.current.value) || undefined,
+        domain: domainRef.current.value || undefined,
+        path: pathRef.current.value || undefined,
+        expirationDate:
+          dateToUnixTime(new Date(expirationRef.current.value)) || undefined,
+        storeId: props.cookie.chromeCookie.storeId,
+        secure: secureRef.current.checked,
+        httpOnly: httpOnlyRef.current.checked,
+        sameSite: sameSiteRef.current.value as CookieSameSite,
+        ...(hostOnlyRef.current.checked ? { domain: undefined } : undefined),
+        ...(sessionRef.current.checked
+          ? { expirationDate: undefined }
+          : undefined),
+      });
     }
-  });
+  }
 
   return (
-    <div class="flex flex-col gap-6">
-      <div class="flex flex-col gap-3">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         {/* Name */}
-        <div class="flex flex-col gap-1">
-          <p class="px-2 text-sm font-bold">Name</p>
+        <div className="flex flex-col gap-1">
+          <p className="px-2 text-sm font-bold">Name</p>
           <TextBox
-            ref={formRefs.name}
+            ref={nameRef}
             placeholder={"unknown"}
             value={props.cookie.chromeCookie.name}
+            onChange={(e) => {
+              e.target.value;
+            }}
           />
         </div>
 
         {/* Value */}
-        <div class="flex w-full flex-col gap-1">
-          <p class="px-2 text-sm font-bold">Value</p>
+        <div className="flex w-full flex-col gap-1">
+          <p className="px-2 text-sm font-bold">Value</p>
           <textarea
-            ref={formRefs.value}
-            class="w-full resize-none rounded border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-800"
-            rows="3"
+            ref={valueRef}
+            className="w-full resize-none rounded border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-800"
+            rows={3}
             value={decodeURIComponent(props.cookie.chromeCookie.value)}
           />
         </div>
 
         {/* Domain & Path */}
-        <div class="flex gap-2">
-          <div class="flex w-full flex-col gap-1">
-            <p class="px-2 text-sm font-bold">Domain</p>
-            <TextBox
-              ref={formRefs.domain}
-              value={props.cookie.chromeCookie.domain}
-            />
+        <div className="flex gap-2">
+          <div className="flex w-full flex-col gap-1">
+            <p className="px-2 text-sm font-bold">Domain</p>
+            <TextBox ref={domainRef} value={props.cookie.chromeCookie.domain} />
           </div>
-          <div class="flex w-full flex-col gap-1">
-            <p class="px-2 text-sm font-bold">Path</p>
-            <TextBox
-              ref={formRefs.path}
-              value={props.cookie.chromeCookie.path}
-            />
+          <div className="flex w-full flex-col gap-1">
+            <p className="px-2 text-sm font-bold">Path</p>
+            <TextBox ref={pathRef} value={props.cookie.chromeCookie.path} />
           </div>
         </div>
 
         {/* Expires / Max-Age */}
-        <div class="flex flex-col gap-1">
-          <p class="px-2 text-sm font-bold">Expires / Max-Age</p>
-          <TextBox
-            ref={formRefs.expiration}
-            value={props.cookie.displayExpiration}
-          />
+        <div className="flex flex-col gap-1">
+          <p className="px-2 text-sm font-bold">Expires / Max-Age</p>
+          <TextBox ref={expirationRef} value={props.cookie.displayExpiration} />
         </div>
 
         {/* SameSite */}
-        <div class="w-min">
-          <label class="flex cursor-pointer items-center gap-2">
-            <p class="text-sm font-bold">SameSite</p>
-            <div class="relative flex items-center justify-end">
-              <IoChevronDown class="absolute mr-2" size={12} />
+        <div className="w-min">
+          <label className="flex cursor-pointer items-center gap-2">
+            <p className="text-sm font-bold">SameSite</p>
+            <div className="relative flex items-center justify-end">
+              <div className="size-4 bg-red-600" />
               <select
-                ref={formRefs.sameSite}
+                ref={sameSiteRef}
                 value={props.cookie.chromeCookie.sameSite}
-                class="cursor-pointer appearance-none rounded border border-slate-300 bg-white p-2 pr-5 dark:border-slate-600 dark:bg-slate-800"
+                className="cursor-pointer appearance-none rounded border border-slate-300 bg-white p-2 pr-5 dark:border-slate-600 dark:bg-slate-800"
                 name="sameSite"
               >
                 <option value="unspecified">Unspecified</option>
@@ -132,62 +128,64 @@ export function CookieForm(_props: {
         </div>
 
         {/* CheckBox */}
-        <div class="flex gap-3">
-          <label class="flex items-center gap-1 hover:cursor-pointer">
+        <div className="flex gap-3">
+          <label className="flex items-center gap-1 hover:cursor-pointer">
             <CheckBox
-              ref={formRefs.secure}
+              ref={secureRef}
               checked={props.cookie.chromeCookie.secure}
             />
-            <p class="font-bold">Secure</p>
+            <p className="font-bold">Secure</p>
           </label>
-          <label class="flex items-center gap-1 hover:cursor-pointer">
+          <label className="flex items-center gap-1 hover:cursor-pointer">
             <CheckBox
-              ref={formRefs.httpOnly}
+              ref={httpOnlyRef}
               checked={props.cookie.chromeCookie.httpOnly}
             />
-            <p class="font-bold">HttpOnly</p>
+            <p className="font-bold">HttpOnly</p>
           </label>
-          <label class="flex items-center gap-1 hover:cursor-pointer">
+          <label className="flex items-center gap-1 hover:cursor-pointer">
             <CheckBox
-              ref={formRefs.hostOnly}
+              ref={hostOnlyRef}
               checked={props.cookie.chromeCookie.hostOnly}
             />
-            <p class="font-bold">HostOnly</p>
+            <p className="font-bold">HostOnly</p>
           </label>
-          <label class="flex items-center gap-1 hover:cursor-pointer">
+          <label className="flex items-center gap-1 hover:cursor-pointer">
             <CheckBox
-              ref={formRefs.session}
+              ref={sessionRef}
               checked={props.cookie.chromeCookie.session}
             />
-            <p class="font-bold">Session</p>
+            <p className="font-bold">Session</p>
           </label>
         </div>
       </div>
-      <div class="flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div>
-          {props.isRemove && (
+          {isRemove && (
             <button
+              type="button"
               onClick={() => props.onRemove?.()}
-              class="block rounded border border-slate-300 bg-white p-2 transition-colors hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-900"
+              className="block rounded border border-slate-300 bg-white p-2 transition-colors hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-900"
             >
-              <div class="flex h-5 w-5 items-center justify-center">
-                {<IoTrash size={16} />}
+              <div className="flex h-5 w-5 items-center justify-center">
+                <div className="size-4 i-ph-trash" />
               </div>
             </button>
           )}
         </div>
-        <div class="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => props.onCancel()}
-            class="rounded border border-slate-300 bg-white px-6 py-2 text-sm font-bold transition-colors hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-900"
+            className="rounded border border-slate-300 bg-white px-6 py-2 text-sm font-bold transition-colors hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-900"
           >
             Cancel
           </button>
 
           <button
+            type="button"
             onClick={onSave}
-            disabled={!changed()}
-            class={cls(
+            className={cls(
               "px-6 py-2 text-sm rounded text-white font-bold transition-all bg-blue-500 border border-blue-500 enabled:hover:bg-blue-600 disabled:opacity-30",
             )}
           >
@@ -200,4 +198,4 @@ export function CookieForm(_props: {
 }
 
 // white json
-//  <p class="whitespace-pre">{JSON.stringify(props.cookie, undefined, 2)}</p>
+//  <p className="whitespace-pre">{JSON.stringify(props.cookie, undefined, 2)}</p>

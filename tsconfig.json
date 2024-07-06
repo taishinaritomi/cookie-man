@@ -8,8 +8,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js"
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   },
   "exclude": ["node_modules", "dist", "**/*.*js"]
 }

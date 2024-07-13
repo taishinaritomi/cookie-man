@@ -1,6 +1,7 @@
 import { crx, defineManifest } from "@crxjs/vite-plugin";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import inspect from "vite-plugin-inspect";
 import tsconfigPaths from "vite-tsconfig-paths";
 import packageJson from "./package.json";
 
@@ -30,6 +31,10 @@ export default defineConfig({
     minify: false,
   },
   plugins: [
+    inspect({
+      build: true,
+      outputDir: ".vite-inspect",
+    }),
     tsconfigPaths(),
     crx({ manifest }),
     react({

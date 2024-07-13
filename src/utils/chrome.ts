@@ -25,5 +25,5 @@ export async function getCurrentURL() {
     currentWindow: true,
   });
 
-  return currentTab?.url;
+  return currentTab?.url ?? null;
 }

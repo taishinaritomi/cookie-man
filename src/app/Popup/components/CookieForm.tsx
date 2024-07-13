@@ -4,7 +4,7 @@ import { cls } from "@/utils/cls";
 import { dateToUnixTime } from "@/utils/date";
 import { useRef } from "react";
 import type { Cookie, CookieSameSite, SetCookie } from "../providers/cookie";
-import { useCookie } from "../providers/cookie";
+import { useCurrentURL } from "../providers/cookie";
 
 export function CookieForm(props: {
   cookie: Cookie;
@@ -15,7 +15,7 @@ export function CookieForm(props: {
 }) {
   const isRemove = props.isRemove || false;
 
-  const { currentURL } = useCookie();
+  const { currentURL } = useCurrentURL();
 
   const nameRef = useRef<HTMLInputElement>(null);
   const valueRef = useRef<HTMLTextAreaElement>(null);
@@ -186,7 +186,7 @@ export function CookieForm(props: {
             type="button"
             onClick={onSave}
             className={cls(
-              "px-6 py-2 text-sm rounded text-white font-bold transition-all bg-blue-500 border border-blue-500 enabled:hover:bg-blue-600 disabled:opacity-30",
+              "px-6 py-2 text-sm rounded text-white font-bold transition-all bg-blue-500 border border-blue-500 enabled:hover:bg-blue-600 disabled:opacity-30"
             )}
           >
             Save

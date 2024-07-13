@@ -57,80 +57,31 @@ async function getCookies(_url: string) {
   return cookies;
 }
 
-const _initURL = getCurrentURL();
+export function useCurrentURL() {
+  const {
+    currentURL: _currentURL,
+    setCurrentURL,
+    refreshCurrentURL,
+  } = useCookieContext();
+  const currentURL = use(_currentURL);
 
-function useCurrentURL() {
-  const initURL = use(_initURL);
-
-  if (!initURL) throw new Error("No current tab");
-
-  const [currentURL, _setCurrentURL] = useState(initURL);
-
-  async function refreshCurrentURL() {
-    const url = await getCurrentURL();
-    if (url) _setCurrentURL(url);
-  }
-
-  async function setCurrentURL(url: string) {
-    _setCurrentURL(url);
-  }
-
-  return { currentURL, setCurrentURL, refreshCurrentURL } as const;
+  return { currentURL, setCurrentURL, refreshCurrentURL };
 }
 
-function useCookies(url: string | null) {
-  const [_cookies, _setCookies] = useState(() => {
-    return url ? getCookies(url) : Promise.resolve([]);
-  });
-
-  const loadCookies = useCallback(() => {
-    _setCookies(url ? getCookies(url) : Promise.resolve([]));
-  }, [url]);
-
-  useEffect(() => {
-    chrome.cookies.onChanged.addListener(loadCookies);
-    return () => {
-      chrome.cookies.onChanged.removeListener(loadCookies);
-    };
-  }, [loadCookies]);
-
-  function refreshCookies() {
-    loadCookies();
-  }
-
-  const cookies = use(_cookies);
-
-  return { cookies, refreshCookies };
+export function useSearchText() {
+  const { searchText, setSearchText } = useCookieContext();
+  return { searchText, setSearchText };
 }
-
-export interface CookieContext {
-  cookies: Cookie[];
-  currentURL: string;
-  setCurrentURL(url: string): void;
-  refreshCurrentURL(): void;
-  refreshCookie(): void;
-  defaultCookie: Cookie;
-  searchText: string;
-  setSearchText(text: string): void;
-
-  createCookie(setCookie: SetCookie): void;
-  updateCookie(cookie: Cookie, setCookie: SetCookie): void;
-  removeCookie(cookie: Cookie): void;
-}
-
-const CookieContext = createContext<CookieContext | null>(null);
 
 export function useCookie() {
-  const context = useContext(CookieContext);
-  if (!context)
-    throw new Error("useCookie must be used within a CookieProvider");
-  return context;
-}
+  const {
+    cookies: chromeCookies,
+    searchText,
+    refreshCookie,
+  } = useCookieContext();
 
-export function CookieProvider(props: PropsWithChildren) {
-  const { currentURL, setCurrentURL, refreshCurrentURL } = useCurrentURL();
-  const { cookies: _cookies, refreshCookies } = useCookies(currentURL);
-  const [searchText, setSearchText] = useState("");
+  const _cookies = use(chromeCookies);
+  const { currentURL } = useCurrentURL();
 
   const formattedCookies = useMemo(
     () => _cookies.map(formatCookie),
@@ -148,7 +99,7 @@ export function CookieProvider(props: PropsWithChildren) {
   }, [formattedCookies, searchText]);
 
   const defaultCookie = useMemo(() => {
-    const url = new URL(currentURL || "http://localhost");
+    const url = new URL(currentURL ?? "http://example.com");
     url.port = "";
 
     return {
@@ -194,6 +145,75 @@ export function CookieProvider(props: PropsWithChildren) {
     });
   }
 
+  return {
+    cookies,
+    defaultCookie,
+    createCookie: createCookie,
+    updateCookie: updateCookie,
+    removeCookie: removeCookie,
+    refreshCookie: refreshCookie,
+  };
+}
+
+export interface CookieContext {
+  cookies: Promise<chrome.cookies.Cookie[]>;
+  currentURL: Promise<string | null>;
+  setCurrentURL(url: string): void;
+  refreshCurrentURL(): void;
+  refreshCookie(): void;
+  searchText: string;
+  setSearchText(text: string): void;
+}
+
+const CookieContext = createContext<CookieContext | null>(null);
+
+export function useCookieContext() {
+  const context = useContext(CookieContext);
+  if (!context)
+    throw new Error("useCookie must be used within a CookieProvider");
+  return context;
+}
+
+export function CookieProvider(props: PropsWithChildren) {
+  const [currentURL, _setCurrentURL] = useState(() => getCurrentURL());
+
+  async function refreshCurrentURL() {
+    _setCurrentURL(getCurrentURL());
+  }
+
+  async function setCurrentURL(url: string) {
+    _setCurrentURL(Promise.resolve(url));
+  }
+
+  const [cookies, setCookies] = useState(() => {
+    return currentURL.then((url) =>
+      url ? getCookies(url) : Promise.resolve([])
+    );
+  });
+
+  const loadCookies = useCallback(() => {
+    setCookies(
+      currentURL.then((url) => {
+        return url ? getCookies(url) : Promise.resolve([]);
+      })
+    );
+  }, [currentURL]);
+
+  useEffect(() => {
+    chrome.cookies.onChanged.addListener(loadCookies);
+    return () => {
+      console.log('XXXXXXXXXXXXXXXXXXXXXXXX');
+      
+      chrome.cookies.onChanged.removeListener(loadCookies);
+    };
+  }, [loadCookies]);
+
+  function refreshCookies() {
+    loadCookies();
+  }
+
+  const [searchText, setSearchText] = useState("");
+
   return (
     <CookieContext
       value={{
@@ -201,13 +221,9 @@ export function CookieProvider(props: PropsWithChildren) {
         setCurrentURL: setCurrentURL,
         refreshCurrentURL: refreshCurrentURL,
         cookies: cookies,
-        defaultCookie: defaultCookie,
         refreshCookie: refreshCookies,
         searchText: searchText,
         setSearchText: setSearchText,
-        createCookie: createCookie,
-        updateCookie: updateCookie,
-        removeCookie: removeCookie,
       }}
     >
       {props.children}

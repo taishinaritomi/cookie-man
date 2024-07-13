@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@react-aria/accordion": "3.0.0-alpha.29",
-    "react": "19.0.0-beta-26f2496093-20240514",
+    "react": "19.0.0-rc-f38c22b244-20240704",
     "react-aria-components": "^1.2.1",
-    "react-dom": "19.0.0-beta-26f2496093-20240514"
+    "react-dom": "19.0.0-rc-f38c22b244-20240704"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
@@ -34,12 +34,13 @@
     "tsx": "^4.16.0",
     "typescript": "^5.5.2",
     "vite": "^5.3.2",
+    "vite-plugin-inspect": "^0.8.4",
     "vite-tsconfig-paths": "^4.3.2"
   },
   "pnpm": {
     "overrides": {
-      "react": "19.0.0-beta-26f2496093-20240514",
-      "react-dom": "19.0.0-beta-26f2496093-20240514"
+      "react": "19.0.0-rc-f38c22b244-20240704",
+      "react-dom": "19.0.0-rc-f38c22b244-20240704"
     }
   }
 }

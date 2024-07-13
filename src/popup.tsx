@@ -8,6 +8,6 @@ if (app) {
   createRoot(app).render(
     <StrictMode>
       <PopupView />
-    </StrictMode>,
+    </StrictMode>
   );
 }

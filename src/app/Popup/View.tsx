@@ -5,13 +5,19 @@ import { CookieProvider } from "./providers/cookie";
 
 export function PopupView() {
   return (
-    <div className="flex w-[400px] h-screen flex-col gap-2 p-2 pr-1">
-      <Suspense fallback="cccccccccccccc">
+    <div className="flex w-[400px] h-[600px] flex-col gap-2 p-2 pr-1">
+      <Suspense fallback={<Loading />}>
         <CookieProvider>
           <Header />
-          <CookieList />
+          <Suspense fallback={"vvv"}>
+            <CookieList />
+          </Suspense>
         </CookieProvider>
       </Suspense>
     </div>
   );
+}
+
+function Loading() {
+  return <div className="h-96" />;
 }

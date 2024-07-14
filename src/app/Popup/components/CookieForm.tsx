@@ -1,65 +1,78 @@
 import { CheckBox } from "@/components/CheckBox";
 import { TextBox } from "@/components/TextBox";
-import { cls } from "@/utils/cls";
 import { dateToUnixTime } from "@/utils/date";
-import { useRef } from "react";
-import type { Cookie, CookieSameSite, SetCookie } from "../providers/cookie";
-import { useCurrentURL } from "../providers/cookie";
+import type {
+  Cookie,
+  CookieSameSite,
+  SetCookie,
+  UpdateSetCookie,
+} from "../providers/cookie";
 
-export function CookieForm(props: {
+export enum CookieFormMode {
+  Create = 0,
+  Edit = 1,
+}
+
+type CreateCookieFormProps = {
+  mode: CookieFormMode.Create;
   cookie: Cookie;
-  onSave: (c: SetCookie) => void;
-  onCancel: () => void;
-  isRemove?: boolean;
+  onSave?: (c: SetCookie) => void;
+  onCancel?: () => void;
+};
+
+type EditCookieFormProps = {
+  mode: CookieFormMode.Edit;
+  cookie: Cookie;
+  onUpdate?: (c: UpdateSetCookie) => void;
   onRemove?: () => void;
-}) {
-  const isRemove = props.isRemove || false;
+};
 
-  const { currentURL } = useCurrentURL();
+type CookieFormProps = CreateCookieFormProps | EditCookieFormProps;
 
-  const nameRef = useRef<HTMLInputElement>(null);
-  const valueRef = useRef<HTMLTextAreaElement>(null);
-  const domainRef = useRef<HTMLInputElement>(null);
-  const pathRef = useRef<HTMLInputElement>(null);
-  const expirationRef = useRef<HTMLInputElement>(null);
-  const sameSiteRef = useRef<HTMLSelectElement>(null);
-  const httpOnlyRef = useRef<HTMLInputElement>(null);
-  const hostOnlyRef = useRef<HTMLInputElement>(null);
-  const sessionRef = useRef<HTMLInputElement>(null);
-  const secureRef = useRef<HTMLInputElement>(null);
+export function CookieForm(props: CookieFormProps) {
+  // const nameRef = useRef<HTMLInputElement>(null);
+  // const valueRef = useRef<HTMLTextAreaElement>(null);
+  // const domainRef = useRef<HTMLInputElement>(null);
+  // const pathRef = useRef<HTMLInputElement>(null);
+  // const expirationRef = useRef<HTMLInputElement>(null);
+  // const sameSiteRef = useRef<HTMLSelectElement>(null);
+  // const httpOnlyRef = useRef<HTMLInputElement>(null);
+  // const hostOnlyRef = useRef<HTMLInputElement>(null);
+  // const sessionRef = useRef<HTMLInputElement>(null);
+  // const secureRef = useRef<HTMLInputElement>(null);
 
-  function onSave() {
-    if (
-      nameRef.current &&
-      valueRef.current &&
-      domainRef.current &&
-      pathRef.current &&
-      expirationRef.current &&
-      sameSiteRef.current &&
-      httpOnlyRef.current &&
-      hostOnlyRef.current &&
-      sessionRef.current &&
-      secureRef.current
-    ) {
-      props.onSave({
-        url: currentURL || "",
-        name: nameRef.current.value || undefined,
-        value: encodeURIComponent(valueRef.current.value) || undefined,
-        domain: domainRef.current.value || undefined,
-        path: pathRef.current.value || undefined,
-        expirationDate:
-          dateToUnixTime(new Date(expirationRef.current.value)) || undefined,
-        storeId: props.cookie.chromeCookie.storeId,
-        secure: secureRef.current.checked,
-        httpOnly: httpOnlyRef.current.checked,
-        sameSite: sameSiteRef.current.value as CookieSameSite,
-        ...(hostOnlyRef.current.checked ? { domain: undefined } : undefined),
-        ...(sessionRef.current.checked
-          ? { expirationDate: undefined }
-          : undefined),
-      });
-    }
-  }
+  // function onSave() {
+  //   if (
+  //     nameRef.current &&
+  //     valueRef.current &&
+  //     domainRef.current &&
+  //     pathRef.current &&
+  //     expirationRef.current &&
+  //     sameSiteRef.current &&
+  //     httpOnlyRef.current &&
+  //     hostOnlyRef.current &&
+  //     sessionRef.current &&
+  //     secureRef.current
+  //   ) {
+  //     props.onSave({
+  //       url: currentURL || "",
+  //       name: nameRef.current.value || undefined,
+  //       value: encodeURIComponent(valueRef.current.value) || undefined,
+  //       domain: domainRef.current.value || undefined,
+  //       path: pathRef.current.value || undefined,
+  //       expirationDate:
+  //         dateToUnixTime(new Date(expirationRef.current.value)) || undefined,
+  //       storeId: props.cookie.chromeCookie.storeId,
+  //       secure: secureRef.current.checked,
+  //       httpOnly: httpOnlyRef.current.checked,
+  //       sameSite: sameSiteRef.current.value as CookieSameSite,
+  //       ...(hostOnlyRef.current.checked ? { domain: undefined } : undefined),
+  //       ...(sessionRef.current.checked
+  //         ? { expirationDate: undefined }
+  //         : undefined),
+  //     });
+  //   }
+  // }
 
   return (
     <div className="flex flex-col gap-6">
@@ -68,11 +81,12 @@ export function CookieForm(props: {
         <div className="flex flex-col gap-1">
           <p className="px-2 text-sm font-bold">Name</p>
           <TextBox
-            ref={nameRef}
             placeholder={"unknown"}
             value={props.cookie.chromeCookie.name}
             onChange={(e) => {
-              e.target.value;
+              if (props.mode === CookieFormMode.Edit) {
+                props.onUpdate?.({ name: e.currentTarget.value });
+              }
             }}
           />
         </div>
@@ -81,10 +95,16 @@ export function CookieForm(props: {
         <div className="flex w-full flex-col gap-1">
           <p className="px-2 text-sm font-bold">Value</p>
           <textarea
-            ref={valueRef}
             className="w-full resize-none rounded border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-800"
             rows={3}
             value={decodeURIComponent(props.cookie.chromeCookie.value)}
+            onChange={(e) => {
+              if (props.mode === CookieFormMode.Edit) {
+                props.onUpdate?.({
+                  value: encodeURIComponent(e.currentTarget.value),
+                });
+              }
+            }}
           />
         </div>
 
@@ -92,18 +112,47 @@ export function CookieForm(props: {
         <div className="flex gap-2">
           <div className="flex w-full flex-col gap-1">
             <p className="px-2 text-sm font-bold">Domain</p>
-            <TextBox ref={domainRef} value={props.cookie.chromeCookie.domain} />
+            <TextBox
+              value={props.cookie.chromeCookie.domain}
+              onChange={(e) => {
+                if (props.mode === CookieFormMode.Edit) {
+                  props.onUpdate?.({
+                    domain: e.currentTarget.value,
+                  });
+                }
+              }}
+            />
           </div>
           <div className="flex w-full flex-col gap-1">
             <p className="px-2 text-sm font-bold">Path</p>
-            <TextBox ref={pathRef} value={props.cookie.chromeCookie.path} />
+            <TextBox
+              value={props.cookie.chromeCookie.path}
+              onChange={(e) => {
+                if (props.mode === CookieFormMode.Edit) {
+                  props.onUpdate?.({
+                    path: e.currentTarget.value,
+                  });
+                }
+              }}
+            />
           </div>
         </div>
 
         {/* Expires / Max-Age */}
         <div className="flex flex-col gap-1">
           <p className="px-2 text-sm font-bold">Expires / Max-Age</p>
-          <TextBox ref={expirationRef} value={props.cookie.displayExpiration} />
+          <TextBox
+            value={props.cookie.displayExpiration}
+            onChange={(e) => {
+              if (props.mode === CookieFormMode.Edit) {
+                props.onUpdate?.({
+                  expirationDate: dateToUnixTime(
+                    new Date(e.currentTarget.value),
+                  ),
+                });
+              }
+            }}
+          />
         </div>
 
         {/* SameSite */}
@@ -111,12 +160,18 @@ export function CookieForm(props: {
           <label className="flex cursor-pointer items-center gap-2">
             <p className="text-sm font-bold">SameSite</p>
             <div className="relative flex items-center justify-end">
-              <div className="size-4 bg-red-600" />
+              <div className="size-3 i-ph-caret-down text-slate-800 dark:text-white absolute mr-2" />
               <select
-                ref={sameSiteRef}
                 value={props.cookie.chromeCookie.sameSite}
                 className="cursor-pointer appearance-none rounded border border-slate-300 bg-white p-2 pr-5 dark:border-slate-600 dark:bg-slate-800"
                 name="sameSite"
+                onChange={(e) => {
+                  if (props.mode === CookieFormMode.Edit) {
+                    props.onUpdate?.({
+                      sameSite: e.currentTarget.value as CookieSameSite,
+                    });
+                  }
+                }}
               >
                 <option value="unspecified">Unspecified</option>
                 <option value="no_restriction">No Restriction</option>
@@ -131,35 +186,57 @@ export function CookieForm(props: {
         <div className="flex gap-3">
           <label className="flex items-center gap-1 hover:cursor-pointer">
             <CheckBox
-              ref={secureRef}
               checked={props.cookie.chromeCookie.secure}
+              onChange={(e) => {
+                console.log(props.mode, e);
+
+                if (props.mode === CookieFormMode.Edit) {
+                  props.onUpdate?.({ secure: e.currentTarget.checked });
+                }
+              }}
             />
             <p className="font-bold">Secure</p>
           </label>
           <label className="flex items-center gap-1 hover:cursor-pointer">
             <CheckBox
-              ref={httpOnlyRef}
               checked={props.cookie.chromeCookie.httpOnly}
+              onChange={(e) => {
+                console.log(props.mode, e);
+                if (props.mode === CookieFormMode.Edit) {
+                  props.onUpdate?.({ httpOnly: e.currentTarget.checked });
+                }
+              }}
             />
             <p className="font-bold">HttpOnly</p>
           </label>
           <label className="flex items-center gap-1 hover:cursor-pointer">
             <CheckBox
-              ref={hostOnlyRef}
               checked={props.cookie.chromeCookie.hostOnly}
+              onChange={(e) => {
+                console.log(props.mode, e);
+                if (props.mode === CookieFormMode.Edit) {
+                  props.onUpdate?.({ hostOnly: e.currentTarget.checked });
+                }
+              }}
             />
             <p className="font-bold">HostOnly</p>
           </label>
           <label className="flex items-center gap-1 hover:cursor-pointer">
             <CheckBox
-              ref={sessionRef}
               checked={props.cookie.chromeCookie.session}
+              onChange={(e) => {
+                console.log(props.mode, e);
+                if (props.mode === CookieFormMode.Edit) {
+                  props.onUpdate?.({ session: e.currentTarget.checked });
+                }
+              }}
             />
             <p className="font-bold">Session</p>
           </label>
         </div>
       </div>
-      <div className="flex items-center justify-between">
+
+      {/* <div className="flex items-center justify-between">
         <div>
           {isRemove && (
             <button
@@ -192,7 +269,7 @@ export function CookieForm(props: {
             Save
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

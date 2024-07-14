@@ -28,14 +28,19 @@ export interface Cookie {
 export type CookieSameSite = chrome.cookies.Cookie["sameSite"];
 
 export type SetCookie = chrome.cookies.SetDetails;
+export type UpdateSetCookie = Partial<
+  Omit<SetCookie, "url" | "storeId"> & { hostOnly: boolean; session: boolean }
+>;
 
 function formatCookie(chromeCookie: chrome.cookies.Cookie): Cookie {
   const displayExpiration = chromeCookie.session
     ? "Session"
     : unixTimeToDate(chromeCookie.expirationDate || 0).toISOString();
 
+  console.log(chromeCookie);
+
   return {
-    id: crypto.randomUUID(),
+    id: `${chromeCookie.domain}-${chromeCookie.name}`,
     chromeCookie,
     displayURL: generatePrettyCookieURL(chromeCookie),
     displayExpiration,
@@ -74,54 +79,28 @@ export function useSearchText() {
 }
 
 export function useCookie() {
-  const {
-    cookies: chromeCookies,
-    searchText,
-    refreshCookie,
-  } = useCookieContext();
+  const { cookies: _cookies, refreshCookie } = useCookieContext();
 
-  const _cookies = use(chromeCookies);
+  const cookies = use(_cookies);
   const { currentURL } = useCurrentURL();
-
-  const formattedCookies = useMemo(
-    () => _cookies.map(formatCookie),
-    [_cookies]
-  );
-
-  const cookies = useMemo(() => {
-    const matchedCookie = formattedCookies.map((cookie) => {
-      return Object.assign({}, cookie, {
-        match: searchText ? cookie.searchName.includes(searchText) : false,
-      });
-    });
-
-    return sortCookies(matchedCookie);
-  }, [formattedCookies, searchText]);
 
   const defaultCookie = useMemo(() => {
     const url = new URL(currentURL ?? "http://example.com");
     url.port = "";
 
-    return {
-      id: crypto.randomUUID(),
-      chromeCookie: {
-        name: "",
-        storeId: "",
-        expirationDate: undefined,
-        value: "",
-        domain: url.host,
-        path: "/",
-        sameSite: "no_restriction",
-        hostOnly: true,
-        httpOnly: false,
-        secure: false,
-        session: true,
-      },
-      displayExpiration: "Session",
-      displayURL: "",
-      match: false,
-      searchName: "",
-    } satisfies Cookie;
+    return formatCookie({
+      name: "",
+      storeId: "",
+      expirationDate: undefined,
+      value: "",
+      domain: url.host,
+      path: "/",
+      sameSite: "no_restriction",
+      hostOnly: true,
+      httpOnly: false,
+      secure: false,
+      session: true,
+    });
   }, [currentURL]);
 
   async function createCookie(setCookie: SetCookie) {
@@ -137,6 +116,41 @@ export function useCookie() {
     await chrome.cookies.set(setCookie);
   }
 
+  async function updateCookie2(id: string, updateCookie: UpdateSetCookie) {
+    const cookie = cookies.find((c) => c.id === id);
+
+    if (cookie && currentURL) {
+      await chrome.cookies.remove({
+        url: generateCookieURL(cookie.chromeCookie),
+        name: cookie.chromeCookie.name,
+        storeId: cookie.chromeCookie.storeId,
+      });
+
+      const setCookie: SetCookie = {
+        url: currentURL,
+        name: updateCookie.name ?? cookie.chromeCookie.name,
+        value: updateCookie.value ?? cookie.chromeCookie.value,
+        domain: updateCookie.hostOnly
+          ? undefined
+          : updateCookie.domain ?? cookie.chromeCookie.domain,
+        path: updateCookie.path ?? cookie.chromeCookie.path,
+        expirationDate: updateCookie.session
+          ? undefined
+          : updateCookie.expirationDate ?? cookie.chromeCookie.expirationDate,
+        storeId: cookie.chromeCookie.storeId,
+        secure: updateCookie.secure ?? cookie.chromeCookie.secure,
+        httpOnly: updateCookie.httpOnly ?? cookie.chromeCookie.httpOnly,
+        sameSite: updateCookie.sameSite ?? cookie.chromeCookie.sameSite,
+      };
+
+      console.log(cookie.chromeCookie);
+
+      await chrome.cookies.set(setCookie);
+
+      refreshCookie();
+    }
+  }
+
   async function removeCookie(cookie: Cookie) {
     await chrome.cookies.remove({
       url: generateCookieURL(cookie.chromeCookie),
@@ -148,15 +162,16 @@ export function useCookie() {
   return {
     cookies,
     defaultCookie,
-    createCookie: createCookie,
-    updateCookie: updateCookie,
-    removeCookie: removeCookie,
-    refreshCookie: refreshCookie,
+    createCookie,
+    updateCookie,
+    updateCookie2,
+    removeCookie,
+    refreshCookie,
   };
 }
 
 export interface CookieContext {
-  cookies: Promise<chrome.cookies.Cookie[]>;
+  cookies: Promise<Cookie[]>;
   currentURL: Promise<string | null>;
   setCurrentURL(url: string): void;
   refreshCurrentURL(): void;
@@ -175,7 +190,13 @@ export function useCookieContext() {
 }
 
 export function CookieProvider(props: PropsWithChildren) {
+  const [searchText, setSearchText] = useState("");
   const [currentURL, _setCurrentURL] = useState(() => getCurrentURL());
+  const [chromeCookies, setChromeCookies] = useState(() => {
+    return currentURL.then((url) => {
+      return url ? getCookies(url) : Promise.resolve([]);
+    });
+  });
 
   async function refreshCurrentURL() {
     _setCurrentURL(getCurrentURL());
@@ -185,25 +206,35 @@ export function CookieProvider(props: PropsWithChildren) {
     _setCurrentURL(Promise.resolve(url));
   }
 
-  const [cookies, setCookies] = useState(() => {
-    return currentURL.then((url) =>
-      url ? getCookies(url) : Promise.resolve([])
-    );
-  });
+  const formattedCookies = useMemo(() => {
+    return chromeCookies.then((chromeCookies) => {
+      return chromeCookies.map(formatCookie);
+    });
+  }, [chromeCookies]);
 
   const loadCookies = useCallback(() => {
-    setCookies(
-      currentURL.then((url) => {
-        return url ? getCookies(url) : Promise.resolve([]);
-      })
+    const promise = currentURL.then((url) =>
+      url ? getCookies(url) : Promise.resolve([]),
     );
+
+    promise.then((v) => setChromeCookies(Promise.resolve(v)));
   }, [currentURL]);
+
+  const cookies = useMemo(async () => {
+    return formattedCookies.then((formattedCookies) => {
+      const matchedCookie = formattedCookies.map((cookie) => {
+        return Object.assign({}, cookie, {
+          match: searchText ? cookie.searchName.includes(searchText) : false,
+        });
+      });
+
+      return sortCookies(matchedCookie);
+    });
+  }, [formattedCookies, searchText]);
 
   useEffect(() => {
     chrome.cookies.onChanged.addListener(loadCookies);
     return () => {
-      console.log('XXXXXXXXXXXXXXXXXXXXXXXX');
-      
       chrome.cookies.onChanged.removeListener(loadCookies);
     };
   }, [loadCookies]);
@@ -211,8 +242,6 @@ export function CookieProvider(props: PropsWithChildren) {
   function refreshCookies() {
     loadCookies();
   }
-
-  const [searchText, setSearchText] = useState("");
 
   return (
     <CookieContext

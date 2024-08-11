@@ -1,5 +1,6 @@
+import { Tooltip } from "@/components/Tooltip";
 import { Suspense, useState } from "react";
-import { useCookie, useCurrentURL, useSearchText } from "../providers/cookie";
+import { useCookie, useIsAllCookies, useSearchText } from "../providers/cookie";
 import { CookieForm, CookieFormMode } from "./CookieForm";
 
 const Open = { None: 0, Add: 1, Search: 2 } as const;
@@ -14,11 +15,11 @@ export function Header() {
 
   return (
     <header className="flex flex-col gap-2">
-      <Suspense fallback={<div />}>
+      <Suspense>
         <HeaderContent toggleOpen={toggleOpen} />
       </Suspense>
 
-      <Suspense fallback={<div />}>
+      <Suspense>
         {open === Open.Add && <HeaderAddCookie setOpen={setOpen} />}
         {open === Open.Search && <HeaderSearchCookie />}
       </Suspense>
@@ -27,13 +28,31 @@ export function Header() {
 }
 
 function HeaderContent(props: { toggleOpen: (open: Open) => void }) {
-  const { currentURL, setCurrentURL } = useCurrentURL();
+  const { searchText, setSearchText } = useSearchText();
+  const { isAllCookies, setIsAllCookies } = useIsAllCookies();
   return (
     <div className="flex items-center gap-2">
+      <Tooltip
+        message={isAllCookies ? "view current url cookies" : "view all cookies"}
+      >
+        <button
+          type="button"
+          onClick={() => setIsAllCookies((isAllCookies) => !isAllCookies)}
+          className="flex items-center justify-center rounded-full"
+        >
+          <div className="size-5 rounded-full border border-slate-300 bg-slate-100 flex items-center justify-center dark:border-slate-600 dark:bg-slate-700">
+            {isAllCookies && (
+              <div className="size-3 bg-purple-500 rounded-full dark:bg-purple-600" />
+            )}
+          </div>
+        </button>
+      </Tooltip>
+
       <input
-        value={currentURL ?? ""}
-        onChange={(e) => setCurrentURL(e.currentTarget.value)}
+        value={searchText ?? ""}
+        onChange={(e) => setSearchText(e.currentTarget.value)}
         type="text"
+        placeholder="Search cookies"
         className="grow block rounded border border-slate-300 bg-slate-100 p-2 leading-4 dark:border-slate-600 dark:bg-slate-700"
       />
 
@@ -42,15 +61,7 @@ function HeaderContent(props: { toggleOpen: (open: Open) => void }) {
         onClick={async () => props.toggleOpen(Open.Add)}
         className="flex items-center justify-center rounded border border-slate-300 bg-slate-100 p-2 dark:border-slate-600 dark:bg-slate-700"
       >
-        <div className="size-4 i-ph-plus" />
-      </button>
-
-      <button
-        type="button"
-        onClick={() => props.toggleOpen(Open.Search)}
-        className="flex items-center justify-center rounded border border-slate-300 bg-slate-100 p-2 dark:border-slate-600 dark:bg-slate-700"
-      >
-        <div className="size-4 i-ph-dots-three-vertical-bold" />
+        <div className="size-4 i-ph-plus text-slate-500 dark:text-slate-400" />
       </button>
     </div>
   );

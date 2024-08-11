@@ -1,14 +1,15 @@
-import { alphabetSort, booleanSort } from "@/utils/array";
 import {
   generateCookieURL,
   generatePrettyCookieURL,
   getCurrentURL,
 } from "@/utils/chrome";
-import { unixTimeToDate } from "@/utils/date";
+import Fuse from "fuse.js";
 import {
+  type Dispatch,
   type PropsWithChildren,
+  type SetStateAction,
   createContext,
-  use,
+  // use,
   useCallback,
   useContext,
   useEffect,
@@ -18,10 +19,7 @@ import {
 
 export interface Cookie {
   id: string;
-  match: boolean;
-  searchName: string;
   displayURL: string;
-  displayExpiration: string;
   chromeCookie: chrome.cookies.Cookie;
 }
 
@@ -33,44 +31,18 @@ export type UpdateSetCookie = Partial<
 >;
 
 function formatCookie(chromeCookie: chrome.cookies.Cookie): Cookie {
-  const displayExpiration = chromeCookie.session
-    ? "Session"
-    : unixTimeToDate(chromeCookie.expirationDate || 0).toISOString();
-
-  console.log(chromeCookie);
-
   return {
-    id: `${chromeCookie.domain}-${chromeCookie.name}`,
+    id: crypto.randomUUID(),
     chromeCookie,
     displayURL: generatePrettyCookieURL(chromeCookie),
-    displayExpiration,
-    match: false,
-    searchName: chromeCookie.name.toLowerCase(),
   };
 }
 
-function sortCookies(cookies: Cookie[]) {
-  return cookies.sort(alphabetSort("searchName")).sort(booleanSort("match"));
-}
-
-async function getCookies(_url: string) {
-  const url = new URL(_url);
-  const cookies = await chrome.cookies.getAll({
-    url: url.toString(),
-  });
-
+async function getCookies(url: string | null) {
+  const start = performance.now();
+  const cookies = await chrome.cookies.getAll({ url: url ?? undefined });
+  console.log("getCookies", performance.now() - start);
   return cookies;
-}
-
-export function useCurrentURL() {
-  const {
-    currentURL: _currentURL,
-    setCurrentURL,
-    refreshCurrentURL,
-  } = useCookieContext();
-  const currentURL = use(_currentURL);
-
-  return { currentURL, setCurrentURL, refreshCurrentURL };
 }
 
 export function useSearchText() {
@@ -78,11 +50,32 @@ export function useSearchText() {
   return { searchText, setSearchText };
 }
 
-export function useCookie() {
-  const { cookies: _cookies, refreshCookie } = useCookieContext();
+export function useIsAllCookies() {
+  const { isAllCookies, setIsAllCookies } = useCookieContext();
+  return { isAllCookies, setIsAllCookies };
+}
 
-  const cookies = use(_cookies);
-  const { currentURL } = useCurrentURL();
+export function useCookie() {
+  const {
+    currentURL: _currentURL,
+    cookies: _cookies,
+    refreshCookie,
+    updateCookies,
+  } = useCookieContext();
+
+  // const cookies = use(_cookies);
+
+  const [currentURL, setCurrentURL] = useState<string | null>(null);
+
+  useEffect(() => {
+    _currentURL.then((v) => setCurrentURL(v));
+  }, [_currentURL]);
+
+  const [cookies, setCookies] = useState<Cookie[]>([]);
+
+  useEffect(() => {
+    _cookies.then((v) => setCookies(v));
+  }, [_cookies]);
 
   const defaultCookie = useMemo(() => {
     const url = new URL(currentURL ?? "http://example.com");
@@ -107,16 +100,7 @@ export function useCookie() {
     await chrome.cookies.set(setCookie);
   }
 
-  async function updateCookie(cookie: Cookie, setCookie: SetCookie) {
-    await chrome.cookies.remove({
-      url: generateCookieURL(cookie.chromeCookie),
-      name: cookie.chromeCookie.name,
-      storeId: cookie.chromeCookie.storeId,
-    });
-    await chrome.cookies.set(setCookie);
-  }
-
-  async function updateCookie2(id: string, updateCookie: UpdateSetCookie) {
+  async function updateCookie(id: string, updateCookie: UpdateSetCookie) {
     const cookie = cookies.find((c) => c.id === id);
 
     if (cookie && currentURL) {
@@ -143,11 +127,23 @@ export function useCookie() {
         sameSite: updateCookie.sameSite ?? cookie.chromeCookie.sameSite,
       };
 
-      console.log(cookie.chromeCookie);
+      const newCookie = await chrome.cookies.set(setCookie);
 
-      await chrome.cookies.set(setCookie);
+      if (newCookie) {
+        updateCookies((cookies) => {
+          const updatedCookies = cookies.map((cookie) => {
+            if (cookie.id === id) {
+              const formattedCookie = formatCookie(newCookie);
+              formattedCookie.id = id;
 
-      refreshCookie();
+              return formattedCookie;
+            }
+            return cookie;
+          });
+
+          return updatedCookies;
+        });
+      }
     }
   }
 
@@ -164,25 +160,27 @@ export function useCookie() {
     defaultCookie,
     createCookie,
     updateCookie,
-    updateCookie2,
     removeCookie,
     refreshCookie,
   };
 }
 
-export interface CookieContext {
-  cookies: Promise<Cookie[]>;
+interface CookieContext {
   currentURL: Promise<string | null>;
-  setCurrentURL(url: string): void;
-  refreshCurrentURL(): void;
+  cookies: Promise<Cookie[]>;
+  updateCookies: Dispatch<SetStateAction<Cookie[]>>;
   refreshCookie(): void;
   searchText: string;
   setSearchText(text: string): void;
+  openCookieId: string | null;
+  setOpenCookieId: Dispatch<SetStateAction<string | null>>;
+  isAllCookies: boolean;
+  setIsAllCookies: Dispatch<SetStateAction<boolean>>;
 }
 
 const CookieContext = createContext<CookieContext | null>(null);
 
-export function useCookieContext() {
+function useCookieContext() {
   const context = useContext(CookieContext);
   if (!context)
     throw new Error("useCookie must be used within a CookieProvider");
@@ -191,68 +189,90 @@ export function useCookieContext() {
 
 export function CookieProvider(props: PropsWithChildren) {
   const [searchText, setSearchText] = useState("");
-  const [currentURL, _setCurrentURL] = useState(() => getCurrentURL());
-  const [chromeCookies, setChromeCookies] = useState(() => {
-    return currentURL.then((url) => {
-      return url ? getCookies(url) : Promise.resolve([]);
-    });
-  });
+  const [isAllCookies, setIsAllCookies] = useState(false);
 
-  async function refreshCurrentURL() {
-    _setCurrentURL(getCurrentURL());
-  }
-
-  async function setCurrentURL(url: string) {
-    _setCurrentURL(Promise.resolve(url));
-  }
-
-  const formattedCookies = useMemo(() => {
-    return chromeCookies.then((chromeCookies) => {
-      return chromeCookies.map(formatCookie);
-    });
-  }, [chromeCookies]);
-
-  const loadCookies = useCallback(() => {
-    const promise = currentURL.then((url) =>
-      url ? getCookies(url) : Promise.resolve([]),
-    );
-
-    promise.then((v) => setChromeCookies(Promise.resolve(v)));
-  }, [currentURL]);
+  const [currentURL] = useState(() => getCurrentURL());
 
   const cookies = useMemo(async () => {
-    return formattedCookies.then((formattedCookies) => {
-      const matchedCookie = formattedCookies.map((cookie) => {
-        return Object.assign({}, cookie, {
-          match: searchText ? cookie.searchName.includes(searchText) : false,
-        });
+    const _cookies = await getCookies(isAllCookies ? null : await currentURL);
+
+    return { cookies: _cookies.map(formatCookie), time: performance.now() };
+  }, [isAllCookies, currentURL]);
+
+  const [updatedCookies, setUpdatedCookies] = useState<{
+    cookies: Cookie[];
+    time: number;
+  } | null>(null);
+
+  const [openCookieId, setOpenCookieId] = useState<string | null>(null);
+
+  const refreshCookies = useCallback(async () => {
+    const _currentURL = await currentURL;
+    const cookies = _currentURL ? await getCookies(_currentURL) : [];
+    setUpdatedCookies({
+      cookies: cookies.map(formatCookie),
+      time: performance.now(),
+    });
+  }, [currentURL]);
+
+  const sortedCookies = useMemo(async () => {
+    const isUpdated = (updatedCookies?.time ?? 0) > (await cookies).time;
+
+    const _cookies = isUpdated
+      ? updatedCookies?.cookies ?? []
+      : (await cookies).cookies;
+
+    if (!isUpdated) {
+      setUpdatedCookies(null);
+    }
+
+    if (searchText) {
+      const fuse = new Fuse(_cookies, {
+        keys: ["chromeCookie.name", "chromeCookie.domain", "chromeCookie.path"],
       });
 
-      return sortCookies(matchedCookie);
-    });
-  }, [formattedCookies, searchText]);
+      return fuse.search(searchText).map((r) => {
+        return r.item;
+      });
+    }
 
-  useEffect(() => {
-    chrome.cookies.onChanged.addListener(loadCookies);
-    return () => {
-      chrome.cookies.onChanged.removeListener(loadCookies);
-    };
-  }, [loadCookies]);
+    return _cookies;
+  }, [cookies, updatedCookies, searchText]);
 
-  function refreshCookies() {
-    loadCookies();
+  async function updateCookies(value: SetStateAction<Cookie[]>) {
+    if (value instanceof Function) {
+      setUpdatedCookies({
+        cookies: value((updatedCookies ?? (await cookies)).cookies),
+        time: performance.now(),
+      });
+    } else {
+      setUpdatedCookies({
+        cookies: value,
+        time: performance.now(),
+      });
+    }
   }
+
+  // useEffect(() => {
+  //   chrome.cookies.onChanged.addListener(loadCookies);
+  //   return () => {
+  //     chrome.cookies.onChanged.removeListener(loadCookies);
+  //   };
+  // }, [loadCookies]);
 
   return (
     <CookieContext
       value={{
-        currentURL: currentURL,
-        setCurrentURL: setCurrentURL,
-        refreshCurrentURL: refreshCurrentURL,
-        cookies: cookies,
+        currentURL,
+        cookies: sortedCookies,
+        updateCookies,
         refreshCookie: refreshCookies,
         searchText: searchText,
         setSearchText: setSearchText,
+        openCookieId,
+        setOpenCookieId,
+        isAllCookies,
+        setIsAllCookies,
       }}
     >
       {props.children}

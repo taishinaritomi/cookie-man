@@ -5,11 +5,11 @@ import { CookieProvider } from "./providers/cookie";
 
 export function Popup() {
   return (
-    <div className="flex w-[400px] h-[600px] flex-col gap-2 p-2 pr-1">
+    <div className="flex flex-col gap-2 p-2 pr-1 w-[400px]">
       <Suspense>
         <CookieProvider>
           <Header />
-          <Suspense fallback={<div />}>
+          <Suspense>
             <CookieList />
           </Suspense>
         </CookieProvider>

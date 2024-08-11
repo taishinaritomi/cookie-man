@@ -1,20 +1,65 @@
 import { cls } from "@/utils/cls";
+import * as Accordion from "@radix-ui/react-accordion";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
-import {} from "react-aria-components";
 import { type Cookie, useCookie } from "../providers/cookie";
 import { CookieForm, CookieFormMode } from "./CookieForm";
 
-// https://github.com/adobe/react-spectrum/blob/main/packages/%40react-spectrum/accordion/src/Accordion.tsx
-
 export function CookieList() {
   const { cookies } = useCookie();
+  const parentRef = useRef<HTMLDivElement | null>(null);
+
+  const virtualizer = useWindowVirtualizer({
+    count: cookies.length,
+    estimateSize: () => 64,
+    overscan: 50,
+    scrollMargin: parentRef.current?.offsetTop ?? 0,
+    scrollPaddingEnd: 8,
+  });
+
+  const items = virtualizer.getVirtualItems();
+
+  const transformY =
+    (items[0]?.start ?? 0) - (parentRef.current?.offsetTop ?? 0);
+
   return (
-    <div className="flex flex-col gap-2">
+    <div ref={parentRef}>
       {cookies.length === 0 && <NoCookie />}
-      {cookies.length > 0 &&
-        cookies.map((cookie) => {
-          return <CookieItem key={cookie.id} cookie={cookie} />;
-        })}
+      {cookies.length > 0 && (
+        <Accordion.Root
+          type="multiple"
+          style={{
+            height: virtualizer.getTotalSize(),
+            width: "100%",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              transform: `translateY(${transformY ? transformY + 8 : 0}px)`,
+            }}
+            className="flex flex-col gap-2 pb-2"
+          >
+            {items.map((item) => {
+              const cookie = cookies[item.index] as Cookie;
+
+              return (
+                <div
+                  key={cookie.id}
+                  data-index={item.index}
+                  ref={virtualizer.measureElement}
+                >
+                  <CookieItem cookie={cookie} />
+                </div>
+              );
+            })}
+          </div>
+        </Accordion.Root>
+      )}
     </div>
   );
 }
@@ -28,28 +73,27 @@ function NoCookie() {
 }
 
 function CookieItem(props: { cookie: Cookie }) {
-  const { updateCookie2, removeCookie } = useCookie();
-  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const { updateCookie, removeCookie } = useCookie();
 
   return (
-    <details
-      ref={detailsRef}
+    <Accordion.Item
+      value={props.cookie.id}
       className={cls(
         "border border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700 group",
-        props.cookie.match && "border-slate-400 dark:border-slate-500",
+        // props.cookie.match && "border-slate-400 dark:border-slate-500"
       )}
     >
-      <summary
+      <Accordion.Trigger
         className={cls(
-          "p-2 rounded cursor-pointer",
-          props.cookie.match && "bg-slate-300 dark:bg-slate-600",
+          "p-2 rounded truncate w-full",
+          // props.cookie.match && "bg-slate-300 dark:bg-slate-600",
           "rounded-b-none",
         )}
       >
         <div className="flex items-center gap-2">
           <div
             className={
-              "transition-transform size-4 rotate-0  group-open:rotate-90 i-ph-caret-right text-slate-800 dark:text-white"
+              "transition-transform size-4 rotate-0  group-data-[state=open]:rotate-90 i-ph-caret-right text-slate-500 dark:text-slate-400 shrink-0"
             }
           />
           <div className="flex flex-col gap-1 overflow-hidden text-left">
@@ -62,26 +106,26 @@ function CookieItem(props: { cookie: Cookie }) {
               {props.cookie.chromeCookie.name || "unknown"}
             </p>
 
-            <p className="mb-1 w-fit truncate rounded-full bg-purple-500 px-2 text-white shadow">
+            <p className="truncate text-slate-500 dark:text-slate-400">
               {props.cookie.displayURL}
             </p>
           </div>
         </div>
-      </summary>
+      </Accordion.Trigger>
 
-      <div
+      <Accordion.Content
         className={cls(
           "p-3 border-t border-slate-300 dark:border-slate-600",
-          props.cookie.match && "border-slate-400 dark:border-slate-500",
+          // props.cookie.match && "border-slate-400 dark:border-slate-500"
         )}
       >
         <CookieForm
           cookie={props.cookie}
           mode={CookieFormMode.Edit}
-          onUpdate={(c) => updateCookie2(props.cookie.id, c)}
+          onUpdate={(c) => updateCookie(props.cookie.id, c)}
           onRemove={() => removeCookie(props.cookie)}
         />
-      </div>
-    </details>
+      </Accordion.Content>
+    </Accordion.Item>
   );
 }

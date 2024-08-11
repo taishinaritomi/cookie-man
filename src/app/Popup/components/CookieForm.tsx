@@ -1,6 +1,6 @@
 import { CheckBox } from "@/components/CheckBox";
 import { TextBox } from "@/components/TextBox";
-import { dateToUnixTime } from "@/utils/date";
+import { dateToUnixTime, unixTimeToDate } from "@/utils/date";
 import type {
   Cookie,
   CookieSameSite,
@@ -30,50 +30,6 @@ type EditCookieFormProps = {
 type CookieFormProps = CreateCookieFormProps | EditCookieFormProps;
 
 export function CookieForm(props: CookieFormProps) {
-  // const nameRef = useRef<HTMLInputElement>(null);
-  // const valueRef = useRef<HTMLTextAreaElement>(null);
-  // const domainRef = useRef<HTMLInputElement>(null);
-  // const pathRef = useRef<HTMLInputElement>(null);
-  // const expirationRef = useRef<HTMLInputElement>(null);
-  // const sameSiteRef = useRef<HTMLSelectElement>(null);
-  // const httpOnlyRef = useRef<HTMLInputElement>(null);
-  // const hostOnlyRef = useRef<HTMLInputElement>(null);
-  // const sessionRef = useRef<HTMLInputElement>(null);
-  // const secureRef = useRef<HTMLInputElement>(null);
-
-  // function onSave() {
-  //   if (
-  //     nameRef.current &&
-  //     valueRef.current &&
-  //     domainRef.current &&
-  //     pathRef.current &&
-  //     expirationRef.current &&
-  //     sameSiteRef.current &&
-  //     httpOnlyRef.current &&
-  //     hostOnlyRef.current &&
-  //     sessionRef.current &&
-  //     secureRef.current
-  //   ) {
-  //     props.onSave({
-  //       url: currentURL || "",
-  //       name: nameRef.current.value || undefined,
-  //       value: encodeURIComponent(valueRef.current.value) || undefined,
-  //       domain: domainRef.current.value || undefined,
-  //       path: pathRef.current.value || undefined,
-  //       expirationDate:
-  //         dateToUnixTime(new Date(expirationRef.current.value)) || undefined,
-  //       storeId: props.cookie.chromeCookie.storeId,
-  //       secure: secureRef.current.checked,
-  //       httpOnly: httpOnlyRef.current.checked,
-  //       sameSite: sameSiteRef.current.value as CookieSameSite,
-  //       ...(hostOnlyRef.current.checked ? { domain: undefined } : undefined),
-  //       ...(sessionRef.current.checked
-  //         ? { expirationDate: undefined }
-  //         : undefined),
-  //     });
-  //   }
-  // }
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
@@ -97,11 +53,11 @@ export function CookieForm(props: CookieFormProps) {
           <textarea
             className="w-full resize-none rounded border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-800"
             rows={3}
-            value={decodeURIComponent(props.cookie.chromeCookie.value)}
+            defaultValue={props.cookie.chromeCookie.value}
             onChange={(e) => {
               if (props.mode === CookieFormMode.Edit) {
                 props.onUpdate?.({
-                  value: encodeURIComponent(e.currentTarget.value),
+                  value: e.currentTarget.value,
                 });
               }
             }}
@@ -142,7 +98,14 @@ export function CookieForm(props: CookieFormProps) {
         <div className="flex flex-col gap-1">
           <p className="px-2 text-sm font-bold">Expires / Max-Age</p>
           <TextBox
-            value={props.cookie.displayExpiration}
+            value={
+              props.cookie.chromeCookie.expirationDate
+                ? unixTimeToDate(
+                    props.cookie.chromeCookie.expirationDate,
+                  ).toISOString()
+                : "Session"
+            }
+            disabled={!props.cookie.chromeCookie.expirationDate}
             onChange={(e) => {
               if (props.mode === CookieFormMode.Edit) {
                 props.onUpdate?.({
@@ -227,7 +190,14 @@ export function CookieForm(props: CookieFormProps) {
               onChange={(e) => {
                 console.log(props.mode, e);
                 if (props.mode === CookieFormMode.Edit) {
-                  props.onUpdate?.({ session: e.currentTarget.checked });
+                  props.onUpdate?.({
+                    session: e.currentTarget.checked,
+                    expirationDate: e.currentTarget.checked
+                      ? undefined
+                      : dateToUnixTime(
+                          new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+                        ),
+                  });
                 }
               }}
             />

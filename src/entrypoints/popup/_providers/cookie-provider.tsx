@@ -40,7 +40,9 @@ function formatCookie(browserCookie: Browser.cookies.Cookie): Cookie {
 
 async function getCookies(url: string | null) {
   const start = performance.now();
+
   const cookies = await browser.cookies.getAll({ url: url ?? undefined });
+
   console.log("getCookies", performance.now() - start);
   return cookies;
 }

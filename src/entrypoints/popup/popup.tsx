@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { GlobalProvider } from "../../components/globals/global-provider";
 import { CookieList } from "./_components/CookieList";
 import { Header } from "./_components/Header";
-import { CookieProvider } from "./_providers/cookie";
+import { CookieProvider } from "./_providers/cookie-provider";
 
 export function Popup() {
   return (

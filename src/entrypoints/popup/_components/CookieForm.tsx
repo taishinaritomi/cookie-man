@@ -3,7 +3,11 @@ import { CheckBox } from "../../../components/base/check-box";
 import { TextBox } from "../../../components/base/text-box";
 import { cls } from "../../../utils/cls";
 import { unixTimeToDate } from "../../../utils/date";
-import type { Cookie, SetCookie, UpdateSetCookie } from "../_providers/cookie";
+import type {
+  Cookie,
+  SetCookie,
+  UpdateSetCookie,
+} from "../_providers/cookie-provider";
 
 export enum CookieFormMode {
   Create = 0,

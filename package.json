@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "wxt",
+    "dev": "wxt ",
     "build": "wxt build",
     "zip": "wxt zip",
     "fix": "biome check --write .",

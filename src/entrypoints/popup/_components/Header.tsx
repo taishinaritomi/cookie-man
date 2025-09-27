@@ -4,7 +4,7 @@ import {
   useCookie,
   useIsAllCookies,
   useSearchText,
-} from "../_providers/cookie";
+} from "../_providers/cookie-provider";
 import { CookieForm, CookieFormMode } from "./CookieForm";
 
 const Open = { None: 0, Add: 1, Search: 2 } as const;

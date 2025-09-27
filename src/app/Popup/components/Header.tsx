@@ -1,5 +1,5 @@
-import { Tooltip } from "@/components/Tooltip";
 import { Suspense, useState } from "react";
+import { Tooltip } from "@/components/Tooltip";
 import { useCookie, useIsAllCookies, useSearchText } from "../providers/cookie";
 import { CookieForm, CookieFormMode } from "./CookieForm";
 

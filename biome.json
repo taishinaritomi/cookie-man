@@ -1,7 +1,8 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.6.1/schema.json",
-  "organizeImports": {
-    "enabled": true
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "assist": {
+    "enabled": true,
+    "actions": { "recommended": true }
   },
   "formatter": {
     "enabled": true,
@@ -11,10 +12,23 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "suspicious": {
+        "noUnknownAtRules": "off"
+      },
+      "a11y": {
+        "noLabelWithoutControl": {
+          "level": "error",
+          "options": {
+            "inputComponents": ["CheckBox", "TextBox"]
+          }
+        }
+      }
     }
   },
-  "files": {
-    "ignore": ["node_modules", "dist", ".vite-inspect"]
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
   }
 }

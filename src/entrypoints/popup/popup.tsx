@@ -1,7 +1,8 @@
-import "./popup.css";
+import "../../globals.css";
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Popup } from "./app/Popup/Index";
+import { Popup } from "../../app/Popup/Index";
 
 const app = document.getElementById("app");
 

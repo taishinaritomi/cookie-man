@@ -1,7 +1,9 @@
 import { getIconCollections, iconsPlugin } from "@egoist/tailwindcss-icons";
+import type { Config } from "tailwindcss";
 
 /** @type {import('tailwindcss').Config} */
-export default {
+
+const config: Config = {
   content: ["./src/**/*.{ts,tsx}", "index.html", "popup.html"],
   darkMode: "media",
   theme: {
@@ -13,3 +15,5 @@ export default {
     }),
   ],
 };
+
+export default config;

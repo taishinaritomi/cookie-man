@@ -1,21 +1,20 @@
-import {
-  generateCookieURL,
-  generatePrettyCookieURL,
-  getCurrentURL,
-} from "@/utils/chrome";
 import Fuse from "fuse.js";
 import {
+  createContext,
   type Dispatch,
   type PropsWithChildren,
   type SetStateAction,
-  createContext,
-  // use,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
+import {
+  generateCookieURL,
+  generatePrettyCookieURL,
+  getCurrentURL,
+} from "@/utils/chrome";
 
 export interface Cookie {
   id: string;
@@ -64,14 +63,14 @@ export function useCookie() {
   } = useCookieContext();
 
   // const cookies = use(_cookies);
+  // const currentURL = use(_currentURL);
 
   const [currentURL, setCurrentURL] = useState<string | null>(null);
+  const [cookies, setCookies] = useState<Cookie[]>([]);
 
   useEffect(() => {
     _currentURL.then((v) => setCurrentURL(v));
   }, [_currentURL]);
-
-  const [cookies, setCookies] = useState<Cookie[]>([]);
 
   useEffect(() => {
     _cookies.then((v) => setCookies(v));
@@ -84,7 +83,7 @@ export function useCookie() {
     return formatCookie({
       name: "",
       storeId: "",
-      expirationDate: undefined,
+      // expirationDate: undefined,
       value: "",
       domain: url.host,
       path: "/",
@@ -111,16 +110,16 @@ export function useCookie() {
       });
 
       const setCookie: SetCookie = {
-        url: currentURL,
+        url: generateCookieURL(cookie.chromeCookie),
         name: updateCookie.name ?? cookie.chromeCookie.name,
         value: updateCookie.value ?? cookie.chromeCookie.value,
         domain: updateCookie.hostOnly
           ? undefined
-          : updateCookie.domain ?? cookie.chromeCookie.domain,
+          : (updateCookie.domain ?? cookie.chromeCookie.domain),
         path: updateCookie.path ?? cookie.chromeCookie.path,
         expirationDate: updateCookie.session
           ? undefined
-          : updateCookie.expirationDate ?? cookie.chromeCookie.expirationDate,
+          : (updateCookie.expirationDate ?? cookie.chromeCookie.expirationDate),
         storeId: cookie.chromeCookie.storeId,
         secure: updateCookie.secure ?? cookie.chromeCookie.secure,
         httpOnly: updateCookie.httpOnly ?? cookie.chromeCookie.httpOnly,
@@ -219,7 +218,7 @@ export function CookieProvider(props: PropsWithChildren) {
     const isUpdated = (updatedCookies?.time ?? 0) > (await cookies).time;
 
     const _cookies = isUpdated
-      ? updatedCookies?.cookies ?? []
+      ? (updatedCookies?.cookies ?? [])
       : (await cookies).cookies;
 
     if (!isUpdated) {

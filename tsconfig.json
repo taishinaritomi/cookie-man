@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "paths": {
       "@/*": ["./src/*"]
@@ -11,5 +11,5 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react"
   },
-  "exclude": ["node_modules", "dist", "**/*.*js"]
+  "include": ["src", "./.wxt/wxt.d.ts"]
 }

@@ -1,5 +1,5 @@
 export function dateToUnixTime(date: Date) {
-  return Number.parseInt((date.getTime() / 1000).toFixed(0));
+  return Number.parseInt((date.getTime() / 1000).toFixed(0), 10);
 }
 
 export function unixTimeToDate(unixTime: number) {

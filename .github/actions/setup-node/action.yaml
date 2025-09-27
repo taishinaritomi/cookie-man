@@ -1,0 +1,14 @@
+name: "setup-node"
+description: "Setup Node.js"
+runs:
+  using: "composite"
+  steps:
+    - uses: pnpm/action-setup@v2
+      with:
+        version: "10.x"
+    - uses: actions/setup-node@v3
+      with:
+        node-version: "24.x"
+        cache: pnpm
+    - run: pnpm i --frozen-lockfile
+      shell: bash

@@ -1,8 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, type WxtViteConfig } from "wxt";
 
-
-
 // const manifest = defineManifest({
 //   name: "Cookie Man",
 //   version: packageJson.version,

@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
-import { CheckBox } from "@/components/CheckBox";
-import { TextBox } from "@/components/TextBox";
+import { CheckBox } from "@/components/base/CheckBox";
+import { TextBox } from "@/components/base/TextBox";
 import { cls } from "@/utils/cls";
 import { unixTimeToDate } from "@/utils/date";
 import type { Cookie, SetCookie, UpdateSetCookie } from "../providers/cookie";
@@ -29,22 +29,22 @@ type EditCookieFormProps = {
 type CookieFormProps = CreateCookieFormProps | EditCookieFormProps;
 
 export function CookieForm(props: CookieFormProps) {
-  const expirationDate = props.cookie.chromeCookie.expirationDate
-    ? unixTimeToDate(props.cookie.chromeCookie.expirationDate).toISOString()
+  const expirationDate = props.cookie.browserCookie.expirationDate
+    ? unixTimeToDate(props.cookie.browserCookie.expirationDate).toISOString()
     : "Session";
 
   const { register, handleSubmit } = useForm({
     defaultValues: {
-      name: props.cookie.chromeCookie.name,
-      value: props.cookie.chromeCookie.value,
-      domain: props.cookie.chromeCookie.domain,
-      path: props.cookie.chromeCookie.path,
+      name: props.cookie.browserCookie.name,
+      value: props.cookie.browserCookie.value,
+      domain: props.cookie.browserCookie.domain,
+      path: props.cookie.browserCookie.path,
       expirationDate,
-      sameSite: props.cookie.chromeCookie.sameSite,
-      secure: props.cookie.chromeCookie.secure,
-      httpOnly: props.cookie.chromeCookie.httpOnly,
-      hostOnly: props.cookie.chromeCookie.hostOnly,
-      session: props.cookie.chromeCookie.session,
+      sameSite: props.cookie.browserCookie.sameSite,
+      secure: props.cookie.browserCookie.secure,
+      httpOnly: props.cookie.browserCookie.httpOnly,
+      hostOnly: props.cookie.browserCookie.hostOnly,
+      session: props.cookie.browserCookie.session,
     },
   });
 
@@ -105,7 +105,7 @@ export function CookieForm(props: CookieFormProps) {
             <div className="relative flex items-center justify-end">
               <div className="size-3 i-ph-caret-down text-slate-800 dark:text-white absolute mr-2" />
               <select
-                value={props.cookie.chromeCookie.sameSite}
+                value={props.cookie.browserCookie.sameSite}
                 className="cursor-pointer appearance-none rounded border border-slate-300 bg-white p-2 pr-5 dark:border-slate-600 dark:bg-slate-800"
               >
                 <option value="unspecified">Unspecified</option>

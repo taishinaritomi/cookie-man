@@ -100,10 +100,10 @@ function CookieItem(props: { cookie: Cookie }) {
             <p
               className={cls(
                 "font-bold text-base pl-1 truncate",
-                props.cookie.chromeCookie.name ? "" : "opacity-50",
+                props.cookie.browserCookie.name ? "" : "opacity-50",
               )}
             >
-              {props.cookie.chromeCookie.name || "unknown"}
+              {props.cookie.browserCookie.name || "unknown"}
             </p>
 
             <p className="truncate text-slate-500 dark:text-slate-400">

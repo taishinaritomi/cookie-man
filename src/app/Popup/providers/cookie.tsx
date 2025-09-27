@@ -10,36 +10,37 @@ import {
   useMemo,
   useState,
 } from "react";
+import { type Browser, browser } from "wxt/browser";
 import {
   generateCookieURL,
   generatePrettyCookieURL,
   getCurrentURL,
-} from "@/utils/chrome";
+} from "@/utils/browser";
 
 export interface Cookie {
   id: string;
   displayURL: string;
-  chromeCookie: chrome.cookies.Cookie;
+  browserCookie: Browser.cookies.Cookie;
 }
 
-export type CookieSameSite = chrome.cookies.Cookie["sameSite"];
+export type CookieSameSite = Browser.cookies.Cookie["sameSite"];
 
-export type SetCookie = chrome.cookies.SetDetails;
+export type SetCookie = Browser.cookies.SetDetails;
 export type UpdateSetCookie = Partial<
   Omit<SetCookie, "url" | "storeId"> & { hostOnly: boolean; session: boolean }
 >;
 
-function formatCookie(chromeCookie: chrome.cookies.Cookie): Cookie {
+function formatCookie(browserCookie: Browser.cookies.Cookie): Cookie {
   return {
     id: crypto.randomUUID(),
-    chromeCookie,
-    displayURL: generatePrettyCookieURL(chromeCookie),
+    browserCookie,
+    displayURL: generatePrettyCookieURL(browserCookie),
   };
 }
 
 async function getCookies(url: string | null) {
   const start = performance.now();
-  const cookies = await chrome.cookies.getAll({ url: url ?? undefined });
+  const cookies = await browser.cookies.getAll({ url: url ?? undefined });
   console.log("getCookies", performance.now() - start);
   return cookies;
 }
@@ -96,37 +97,38 @@ export function useCookie() {
   }, [currentURL]);
 
   async function createCookie(setCookie: SetCookie) {
-    await chrome.cookies.set(setCookie);
+    await browser.cookies.set(setCookie);
   }
 
   async function updateCookie(id: string, updateCookie: UpdateSetCookie) {
     const cookie = cookies.find((c) => c.id === id);
 
     if (cookie && currentURL) {
-      await chrome.cookies.remove({
-        url: generateCookieURL(cookie.chromeCookie),
-        name: cookie.chromeCookie.name,
-        storeId: cookie.chromeCookie.storeId,
+      await browser.cookies.remove({
+        url: generateCookieURL(cookie.browserCookie),
+        name: cookie.browserCookie.name,
+        storeId: cookie.browserCookie.storeId,
       });
 
       const setCookie: SetCookie = {
-        url: generateCookieURL(cookie.chromeCookie),
-        name: updateCookie.name ?? cookie.chromeCookie.name,
-        value: updateCookie.value ?? cookie.chromeCookie.value,
+        url: generateCookieURL(cookie.browserCookie),
+        name: updateCookie.name ?? cookie.browserCookie.name,
+        value: updateCookie.value ?? cookie.browserCookie.value,
         domain: updateCookie.hostOnly
           ? undefined
-          : (updateCookie.domain ?? cookie.chromeCookie.domain),
-        path: updateCookie.path ?? cookie.chromeCookie.path,
+          : (updateCookie.domain ?? cookie.browserCookie.domain),
+        path: updateCookie.path ?? cookie.browserCookie.path,
         expirationDate: updateCookie.session
           ? undefined
-          : (updateCookie.expirationDate ?? cookie.chromeCookie.expirationDate),
-        storeId: cookie.chromeCookie.storeId,
-        secure: updateCookie.secure ?? cookie.chromeCookie.secure,
-        httpOnly: updateCookie.httpOnly ?? cookie.chromeCookie.httpOnly,
-        sameSite: updateCookie.sameSite ?? cookie.chromeCookie.sameSite,
+          : (updateCookie.expirationDate ??
+            cookie.browserCookie.expirationDate),
+        storeId: cookie.browserCookie.storeId,
+        secure: updateCookie.secure ?? cookie.browserCookie.secure,
+        httpOnly: updateCookie.httpOnly ?? cookie.browserCookie.httpOnly,
+        sameSite: updateCookie.sameSite ?? cookie.browserCookie.sameSite,
       };
 
-      const newCookie = await chrome.cookies.set(setCookie);
+      const newCookie = await browser.cookies.set(setCookie);
 
       if (newCookie) {
         updateCookies((cookies) => {
@@ -147,10 +149,10 @@ export function useCookie() {
   }
 
   async function removeCookie(cookie: Cookie) {
-    await chrome.cookies.remove({
-      url: generateCookieURL(cookie.chromeCookie),
-      name: cookie.chromeCookie.name,
-      storeId: cookie.chromeCookie.storeId,
+    await browser.cookies.remove({
+      url: generateCookieURL(cookie.browserCookie),
+      name: cookie.browserCookie.name,
+      storeId: cookie.browserCookie.storeId,
     });
   }
 
@@ -227,7 +229,11 @@ export function CookieProvider(props: PropsWithChildren) {
 
     if (searchText) {
       const fuse = new Fuse(_cookies, {
-        keys: ["chromeCookie.name", "chromeCookie.domain", "chromeCookie.path"],
+        keys: [
+          "browserCookie.name",
+          "browserCookie.domain",
+          "browserCookie.path",
+        ],
       });
 
       return fuse.search(searchText).map((r) => {
@@ -253,9 +259,9 @@ export function CookieProvider(props: PropsWithChildren) {
   }
 
   // useEffect(() => {
-  //   chrome.cookies.onChanged.addListener(loadCookies);
+  //   browser.cookies.onChanged.addListener(loadCookies);
   //   return () => {
-  //     chrome.cookies.onChanged.removeListener(loadCookies);
+  //     browser.cookies.onChanged.removeListener(loadCookies);
   //   };
   // }, [loadCookies]);
 

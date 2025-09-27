@@ -1,15 +1,15 @@
 import "../../globals.css";
 
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { GlobalProvider } from "@/components/globals/global-provider";
 import { Popup } from "../../app/Popup/Index";
 
-const app = document.getElementById("app");
+const popup = document.getElementById("popup");
 
-if (app) {
-  createRoot(app).render(
-    <StrictMode>
+if (popup) {
+  createRoot(popup).render(
+    <GlobalProvider>
       <Popup />
-    </StrictMode>,
+    </GlobalProvider>,
   );
 }

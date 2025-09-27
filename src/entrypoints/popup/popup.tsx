@@ -13,7 +13,7 @@ export function Popup() {
     <div className="w-[700px] h-[600px]">
       <Suspense>
         <CookieProvider>
-          <div className="w-[240px] fixed h-screen border-gray-300 border-r bg-gray-50">
+          <div className="w-[240px] fixed h-screen border-gray-300 dark:border-gray-600 border-r">
             <Aside />
           </div>
           <div className="ml-[240px]">

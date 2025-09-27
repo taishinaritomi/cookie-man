@@ -45,7 +45,7 @@ export function Aside() {
   }, [virtualizer, currentTab, tabs, setSelectedTab]);
 
   return (
-    <aside className="bg-gray-50 flex h-full flex-col justify-between">
+    <aside className="bg-gray-50 dark:bg-gray-950 flex h-full flex-col justify-between">
       <div className="p-2  flex flex-col gap-2">
         <div className="sticky">
           <input
@@ -54,7 +54,7 @@ export function Aside() {
             type="text"
             placeholder="Search tabs..."
             className={cls(
-              "w-full p-2 border border-slate-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 placeholder:text-gray-400",
+              "w-full p-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 placeholder:text-gray-400",
             )}
           />
         </div>
@@ -102,7 +102,8 @@ export function Aside() {
                   type="button"
                   className={cls(
                     "p-3 text-left w-full rounded-xl border border-black/0 flex flex-col gap-1",
-                    selectedTab?.id === tab.id && "bg-gray-200 border-gray-300",
+                    selectedTab?.id === tab.id &&
+                      "bg-gray-200 border-gray-300 dark:bg-gray-800 dark:border-gray-600",
                   )}
                   key={item.key}
                   style={{

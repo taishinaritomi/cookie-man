@@ -79,15 +79,15 @@ function CookieItem(props: { cookie: Cookie }) {
     <Accordion.Item
       value={props.cookie.id}
       className={cls(
-        "border border-slate-300 dark:border-slate-600 rounded bg-slate-100 dark:bg-slate-700 group",
+        "border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-slate-700 group",
         // props.cookie.match && "border-slate-400 dark:border-slate-500"
       )}
     >
       <Accordion.Trigger
         className={cls(
-          "p-2 rounded truncate w-full",
+          "p-2 rounded-xl truncate w-full",
           // props.cookie.match && "bg-slate-300 dark:bg-slate-600",
-          "rounded-b-none",
+          // "rounded-b-none",
         )}
       >
         <div className="flex items-center gap-2">

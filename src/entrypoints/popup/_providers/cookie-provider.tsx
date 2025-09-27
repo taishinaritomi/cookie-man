@@ -14,7 +14,6 @@ import { type Browser, browser } from "wxt/browser";
 import {
   generateCookieURL,
   generatePrettyCookieURL,
-  getCurrentURL,
 } from "../../../utils/browser";
 
 export interface Cookie {
@@ -52,14 +51,10 @@ export function useSearchText() {
   return { searchText, setSearchText };
 }
 
-export function useIsAllCookies() {
-  const { isAllCookies, setIsAllCookies } = useCookieContext();
-  return { isAllCookies, setIsAllCookies };
-}
-
 export function useCookie() {
   const {
-    currentURL: _currentURL,
+    currentTab,
+    setCurrentTab,
     cookies: _cookies,
     refreshCookie,
     updateCookies,
@@ -72,8 +67,8 @@ export function useCookie() {
   const [cookies, setCookies] = useState<Cookie[]>([]);
 
   useEffect(() => {
-    _currentURL.then((v) => setCurrentURL(v));
-  }, [_currentURL]);
+    setCurrentURL(currentTab?.url ?? null);
+  }, [currentTab]);
 
   useEffect(() => {
     _cookies.then((v) => setCookies(v));
@@ -159,6 +154,9 @@ export function useCookie() {
   }
 
   return {
+    currentURL,
+    currentTab,
+    setCurrentTab,
     cookies,
     defaultCookie,
     createCookie,
@@ -169,7 +167,8 @@ export function useCookie() {
 }
 
 interface CookieContext {
-  currentURL: Promise<string | null>;
+  currentTab: Browser.tabs.Tab | null;
+  setCurrentTab: Dispatch<SetStateAction<Browser.tabs.Tab | null>>;
   cookies: Promise<Cookie[]>;
   updateCookies: Dispatch<SetStateAction<Cookie[]>>;
   refreshCookie(): void;
@@ -177,8 +176,6 @@ interface CookieContext {
   setSearchText(text: string): void;
   openCookieId: string | null;
   setOpenCookieId: Dispatch<SetStateAction<string | null>>;
-  isAllCookies: boolean;
-  setIsAllCookies: Dispatch<SetStateAction<boolean>>;
 }
 
 const CookieContext = createContext<CookieContext | null>(null);
@@ -192,15 +189,14 @@ function useCookieContext() {
 
 export function CookieProvider(props: PropsWithChildren) {
   const [searchText, setSearchText] = useState("");
-  const [isAllCookies, setIsAllCookies] = useState(false);
-
-  const [currentURL] = useState(() => getCurrentURL());
+  const [currentTab, setCurrentTab] = useState<Browser.tabs.Tab | null>(null);
+  // const [currentURL] = useState(() => getCurrentURL());
 
   const cookies = useMemo(async () => {
-    const _cookies = await getCookies(isAllCookies ? null : await currentURL);
+    const _cookies = await getCookies(currentTab?.url ?? null);
 
     return { cookies: _cookies.map(formatCookie), time: performance.now() };
-  }, [isAllCookies, currentURL]);
+  }, [currentTab]);
 
   const [updatedCookies, setUpdatedCookies] = useState<{
     cookies: Cookie[];
@@ -210,13 +206,13 @@ export function CookieProvider(props: PropsWithChildren) {
   const [openCookieId, setOpenCookieId] = useState<string | null>(null);
 
   const refreshCookies = useCallback(async () => {
-    const _currentURL = await currentURL;
+    const _currentURL = currentTab?.url;
     const cookies = _currentURL ? await getCookies(_currentURL) : [];
     setUpdatedCookies({
       cookies: cookies.map(formatCookie),
       time: performance.now(),
     });
-  }, [currentURL]);
+  }, [currentTab?.url]);
 
   const sortedCookies = useMemo(async () => {
     const isUpdated = (updatedCookies?.time ?? 0) > (await cookies).time;
@@ -270,7 +266,8 @@ export function CookieProvider(props: PropsWithChildren) {
   return (
     <CookieContext
       value={{
-        currentURL,
+        currentTab,
+        setCurrentTab,
         cookies: sortedCookies,
         updateCookies,
         refreshCookie: refreshCookies,
@@ -278,8 +275,6 @@ export function CookieProvider(props: PropsWithChildren) {
         setSearchText: setSearchText,
         openCookieId,
         setOpenCookieId,
-        isAllCookies,
-        setIsAllCookies,
       }}
     >
       {props.children}

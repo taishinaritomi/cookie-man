@@ -3,8 +3,8 @@
   <br />
   <div align="center">
     <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/assets/cookie-man-light.svg">
-    <img width="450" height="auto" alt="Cookie Man" src="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/assets/cookie-man-dark.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/store-assets/cookie-man-light.svg">
+    <img width="450" height="auto" alt="Cookie Man" src="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/store-assets/cookie-man-dark.svg">
   </picture>
   </div>
   <br />
@@ -21,7 +21,7 @@
     </a>
   </div>
   <br />
-      <img src="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/assets/screenshot.png">
+      <img src="https://raw.githubusercontent.com/taishinaritomi/cookie-man/main/store-assets/screenshot.png">
 </div>
 
 # Author

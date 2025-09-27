@@ -1,6 +1,10 @@
 import { Suspense, useState } from "react";
-import { Tooltip } from "@/components/base/Tooltip";
-import { useCookie, useIsAllCookies, useSearchText } from "../providers/cookie";
+import { Tooltip } from "../../../components/base/tooltip";
+import {
+  useCookie,
+  useIsAllCookies,
+  useSearchText,
+} from "../_providers/cookie";
 import { CookieForm, CookieFormMode } from "./CookieForm";
 
 const Open = { None: 0, Add: 1, Search: 2 } as const;

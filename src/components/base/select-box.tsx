@@ -4,8 +4,9 @@ type Props = {
   options: string[];
 } & ComponentProps<"select">;
 
-export const SelectBox = (_props: Props) => {
+export function SelectBox(_props: Props) {
   const { options, ...props } = _props;
+
   <label className="relative flex items-center justify-end">
     <div className="i-ph-tag-chevron size-3" />
     <select
@@ -21,4 +22,4 @@ export const SelectBox = (_props: Props) => {
       })}
     </select>
   </label>;
-};
+}

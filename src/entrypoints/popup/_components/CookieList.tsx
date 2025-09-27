@@ -1,8 +1,8 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
-import { cls } from "@/utils/cls";
-import { type Cookie, useCookie } from "../providers/cookie";
+import { cls } from "../../../utils/cls";
+import { type Cookie, useCookie } from "../_providers/cookie";
 import { CookieForm, CookieFormMode } from "./CookieForm";
 
 export function CookieList() {

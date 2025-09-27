@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { cls } from "@/utils/cls";
+import { cls } from "../../utils/cls";
 
 export function CheckBox(props: ComponentProps<"input">) {
   return (

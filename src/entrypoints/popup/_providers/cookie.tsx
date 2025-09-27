@@ -15,7 +15,7 @@ import {
   generateCookieURL,
   generatePrettyCookieURL,
   getCurrentURL,
-} from "@/utils/browser";
+} from "../../../utils/browser";
 
 export interface Cookie {
   id: string;

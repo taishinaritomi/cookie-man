@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
-import { CheckBox } from "@/components/base/CheckBox";
-import { TextBox } from "@/components/base/TextBox";
-import { cls } from "@/utils/cls";
-import { unixTimeToDate } from "@/utils/date";
-import type { Cookie, SetCookie, UpdateSetCookie } from "../providers/cookie";
+import { CheckBox } from "../../../components/base/check-box";
+import { TextBox } from "../../../components/base/text-box";
+import { cls } from "../../../utils/cls";
+import { unixTimeToDate } from "../../../utils/date";
+import type { Cookie, SetCookie, UpdateSetCookie } from "../_providers/cookie";
 
 export enum CookieFormMode {
   Create = 0,

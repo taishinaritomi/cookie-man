@@ -1,11 +1,11 @@
 {
   "name": "cookie-man",
   "private": true,
-  "version": "0.0.6",
+  "version": "1.0.0",
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "wxt ",
+    "dev": "wxt",
     "build": "wxt build",
     "zip": "wxt zip",
     "fix": "biome check --write .",
@@ -13,42 +13,42 @@
     "deps:update": "ncu -u"
   },
   "dependencies": {
-    "@base-ui-components/react": "1.0.0-beta.3",
+    "@base-ui-components/react": "1.0.0-beta.4",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-virtual": "^3.13.12",
     "fuse.js": "^7.1.0",
-    "react": "19.1.1",
-    "react-dom": "19.1.1",
-    "react-hook-form": "^7.63.0"
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-hook-form": "^7.64.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.4",
+    "@biomejs/biome": "^2.2.5",
     "@crxjs/vite-plugin": "^2.2.0",
     "@egoist/tailwindcss-icons": "^1.9.0",
-    "@iconify/json": "^2.2.388",
-    "@tailwindcss/vite": "^4.1.13",
+    "@iconify/json": "^2.2.391",
+    "@tailwindcss/vite": "^4.1.14",
     "@tsconfig/strictest": "^2.0.6",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
-    "@vitejs/plugin-react": "^5.0.3",
+    "@vitejs/plugin-react": "^5.0.4",
     "@wxt-dev/auto-icons": "^1.1.0",
     "@wxt-dev/module-react": "^1.1.5",
     "babel-plugin-react-compiler": "19.1.0-rc.3",
-    "npm-check-updates": "^18.3.0",
+    "npm-check-updates": "^19.0.0",
     "npm-run-all": "^4.1.5",
-    "tailwindcss": "^4.1.13",
+    "tailwindcss": "^4.1.14",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.7",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
     "vite-plugin-inspect": "^11.3.3",
     "vite-tsconfig-paths": "^5.1.4",
     "wxt": "^0.20.11"
   },
   "pnpm": {
     "overrides": {
-      "react": "19.1.1",
-      "react-dom": "19.1.1"
+      "react": "19.2.0",
+      "react-dom": "19.2.0"
     }
   }
 }

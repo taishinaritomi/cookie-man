@@ -8,7 +8,6 @@ export default defineConfig({
     host_permissions: ["<all_urls>"],
     permissions: ["cookies", "tabs", "activeTab"],
   },
-
   modules: ["@wxt-dev/module-react", "@wxt-dev/auto-icons"],
   imports: false,
   srcDir: "src",

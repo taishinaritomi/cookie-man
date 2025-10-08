@@ -16,6 +16,20 @@
       "suspicious": {
         "noUnknownAtRules": "off"
       },
+      "correctness": {
+        "useExhaustiveDependencies": {
+          "level": "error",
+          "options": {
+            "hooks": [
+              {
+                "name": "useEffectUntil",
+                "closureIndex": 0,
+                "dependenciesIndex": 1
+              }
+            ]
+          }
+        }
+      },
       "a11y": {
         "noLabelWithoutControl": {
           "level": "error",

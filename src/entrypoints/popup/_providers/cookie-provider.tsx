@@ -53,8 +53,8 @@ export function useSearchText() {
 
 export function useCookie() {
   const {
-    currentTab,
-    setCurrentTab,
+    selectedTab,
+    setSelectedTab,
     cookies: _cookies,
     refreshCookie,
     updateCookies,
@@ -67,8 +67,8 @@ export function useCookie() {
   const [cookies, setCookies] = useState<Cookie[]>([]);
 
   useEffect(() => {
-    setCurrentURL(currentTab?.url ?? null);
-  }, [currentTab]);
+    setCurrentURL(selectedTab?.url ?? null);
+  }, [selectedTab]);
 
   useEffect(() => {
     _cookies.then((v) => setCookies(v));
@@ -155,8 +155,8 @@ export function useCookie() {
 
   return {
     currentURL,
-    currentTab,
-    setCurrentTab,
+    selectedTab,
+    setSelectedTab,
     cookies,
     defaultCookie,
     createCookie,
@@ -167,8 +167,8 @@ export function useCookie() {
 }
 
 interface CookieContext {
-  currentTab: Browser.tabs.Tab | null;
-  setCurrentTab: Dispatch<SetStateAction<Browser.tabs.Tab | null>>;
+  selectedTab: Browser.tabs.Tab | null;
+  setSelectedTab: Dispatch<SetStateAction<Browser.tabs.Tab | null>>;
   cookies: Promise<Cookie[]>;
   updateCookies: Dispatch<SetStateAction<Cookie[]>>;
   refreshCookie(): void;
@@ -189,14 +189,13 @@ function useCookieContext() {
 
 export function CookieProvider(props: PropsWithChildren) {
   const [searchText, setSearchText] = useState("");
-  const [currentTab, setCurrentTab] = useState<Browser.tabs.Tab | null>(null);
-  // const [currentURL] = useState(() => getCurrentURL());
+  const [selectedTab, setSelectedTab] = useState<Browser.tabs.Tab | null>(null);
 
   const cookies = useMemo(async () => {
-    const _cookies = await getCookies(currentTab?.url ?? null);
+    const _cookies = await getCookies(selectedTab?.url ?? null);
 
     return { cookies: _cookies.map(formatCookie), time: performance.now() };
-  }, [currentTab]);
+  }, [selectedTab]);
 
   const [updatedCookies, setUpdatedCookies] = useState<{
     cookies: Cookie[];
@@ -206,13 +205,13 @@ export function CookieProvider(props: PropsWithChildren) {
   const [openCookieId, setOpenCookieId] = useState<string | null>(null);
 
   const refreshCookies = useCallback(async () => {
-    const _currentURL = currentTab?.url;
+    const _currentURL = selectedTab?.url;
     const cookies = _currentURL ? await getCookies(_currentURL) : [];
     setUpdatedCookies({
       cookies: cookies.map(formatCookie),
       time: performance.now(),
     });
-  }, [currentTab?.url]);
+  }, [selectedTab?.url]);
 
   const sortedCookies = useMemo(async () => {
     const isUpdated = (updatedCookies?.time ?? 0) > (await cookies).time;
@@ -256,18 +255,11 @@ export function CookieProvider(props: PropsWithChildren) {
     }
   }
 
-  // useEffect(() => {
-  //   browser.cookies.onChanged.addListener(loadCookies);
-  //   return () => {
-  //     browser.cookies.onChanged.removeListener(loadCookies);
-  //   };
-  // }, [loadCookies]);
-
   return (
     <CookieContext
       value={{
-        currentTab,
-        setCurrentTab,
+        selectedTab,
+        setSelectedTab,
         cookies: sortedCookies,
         updateCookies,
         refreshCookie: refreshCookies,

@@ -8,14 +8,15 @@ export function useTabs() {
   useEffect(() => {
     async function fetchTabs() {
       const tabs = await browser.tabs.query({});
+
       setTabs(tabs);
     }
-
-    fetchTabs();
 
     browser.tabs.onCreated.addListener(fetchTabs);
     browser.tabs.onUpdated.addListener(fetchTabs);
     browser.tabs.onRemoved.addListener(fetchTabs);
+
+    fetchTabs();
 
     return () => {
       browser.tabs.onCreated.removeListener(fetchTabs);
@@ -31,9 +32,7 @@ export function useSearchTabs(tabs: Browser.tabs.Tab[], searchText: string) {
   return useMemo(() => {
     if (!searchText) return tabs;
 
-    const fuse = new Fuse(tabs, {
-      keys: ["title", "url"],
-    });
+    const fuse = new Fuse(tabs, { keys: ["title", "url"] });
 
     return fuse.search(searchText).map((r) => {
       return r.item;
@@ -50,8 +49,6 @@ export function useCurrentTab() {
         active: true,
         currentWindow: true,
       });
-
-      console.log(tab);
 
       setCurrentTab(tab ?? null);
     }

@@ -109,6 +109,7 @@ function CookieItem(props: { cookie: Cookie }) {
             <p className="truncate text-slate-500 dark:text-slate-400">
               {props.cookie.displayURL}
             </p>
+            {props.cookie.browserCookie.partitionKey?.hasCrossSiteAncestor}
           </div>
         </div>
       </Accordion.Trigger>

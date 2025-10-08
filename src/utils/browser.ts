@@ -21,6 +21,15 @@ export function generatePrettyCookieURL(chromeCookie: Browser.cookies.Cookie) {
   return `${protocol}${separator}${chromeCookie.domain}${chromeCookie.path}`;
 }
 
+export async function getCurrentTab() {
+  const [tab] = await browser.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
+
+  return tab;
+}
+
 export async function getCurrentURL() {
   const [currentTab] = await browser.tabs.query({
     active: true,

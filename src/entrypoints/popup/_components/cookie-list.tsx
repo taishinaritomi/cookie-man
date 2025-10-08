@@ -1,12 +1,15 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
+import { type Cookie, removeCookie, updateCookie } from "../../../libs/browser";
 import { cls } from "../../../utils/cls";
-import { type Cookie, useCookie } from "../_providers/cookie-provider";
-import { CookieForm, CookieFormMode } from "./CookieForm";
+import { CookieForm, CookieFormMode } from "./cookie-form";
 
-export function CookieList() {
-  const { cookies } = useCookie();
+type CookieListProps = {
+  cookies: Cookie[];
+};
+
+export function CookieList({ cookies }: CookieListProps) {
   const parentRef = useRef<HTMLDivElement | null>(null);
 
   const virtualizer = useWindowVirtualizer({
@@ -72,24 +75,19 @@ function NoCookie() {
   );
 }
 
-function CookieItem(props: { cookie: Cookie }) {
-  const { updateCookie, removeCookie } = useCookie();
+type CookieItemProps = {
+  cookie: Cookie;
+};
 
+function CookieItem({ cookie }: CookieItemProps) {
   return (
     <Accordion.Item
-      value={props.cookie.id}
+      value={cookie.id}
       className={cls(
-        "border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-slate-700 group",
-        // props.cookie.match && "border-slate-400 dark:border-slate-500"
+        "border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-200 dark:bg-slate-800 group",
       )}
     >
-      <Accordion.Trigger
-        className={cls(
-          "p-2 rounded-xl truncate w-full",
-          // props.cookie.match && "bg-slate-300 dark:bg-slate-600",
-          // "rounded-b-none",
-        )}
-      >
+      <Accordion.Trigger className={cls("p-2 rounded-xl truncate w-full")}>
         <div className="flex items-center gap-2">
           <div
             className={
@@ -100,31 +98,28 @@ function CookieItem(props: { cookie: Cookie }) {
             <p
               className={cls(
                 "font-bold text-base pl-1 truncate",
-                props.cookie.browserCookie.name ? "" : "opacity-50",
+                cookie.browserCookie.name ? "" : "opacity-50",
               )}
             >
-              {props.cookie.browserCookie.name || "unknown"}
+              {cookie.browserCookie.name || "unknown"}
             </p>
 
             <p className="truncate text-slate-500 dark:text-slate-400">
-              {props.cookie.displayURL}
+              {cookie.displayURL}
             </p>
-            {props.cookie.browserCookie.partitionKey?.hasCrossSiteAncestor}
+            {cookie.browserCookie.partitionKey?.hasCrossSiteAncestor}
           </div>
         </div>
       </Accordion.Trigger>
 
       <Accordion.Content
-        className={cls(
-          "p-3 border-t border-slate-300 dark:border-slate-600",
-          // props.cookie.match && "border-slate-400 dark:border-slate-500"
-        )}
+        className={cls("p-3 border-t border-slate-300 dark:border-slate-600")}
       >
         <CookieForm
-          cookie={props.cookie}
+          cookie={cookie}
           mode={CookieFormMode.Edit}
-          onUpdate={(c) => updateCookie(props.cookie.id, c)}
-          onRemove={() => removeCookie(props.cookie)}
+          onUpdate={(newCookie) => updateCookie(cookie, newCookie)}
+          onRemove={() => removeCookie(cookie)}
         />
       </Accordion.Content>
     </Accordion.Item>

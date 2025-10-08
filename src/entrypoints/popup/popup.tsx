@@ -1,31 +1,24 @@
 import "../../globals.css";
 
-import { Suspense } from "react";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
+import type { Browser } from "#imports";
 import { GlobalProvider } from "../../components/globals/global-provider";
-import { Aside } from "./_components/Aside";
-import { CookieList } from "./_components/CookieList";
-import { Header } from "./_components/Header";
-import { CookieProvider } from "./_providers/cookie-provider";
+import { Aside } from "./_components/aside";
+
+import { Main } from "./_components/main";
 
 export function Popup() {
+  const [selectedTab, setSelectedTab] = useState<Browser.tabs.Tab | null>(null);
+
   return (
     <div className="w-[700px] h-[600px]">
-      <Suspense>
-        <CookieProvider>
-          <div className="w-[240px] fixed h-screen border-gray-300 dark:border-gray-600 border-r">
-            <Aside />
-          </div>
-          <div className="ml-[240px]">
-            <div className="flex flex-col gap-2 p-2 pr-1 w-full">
-              <Header />
-              <Suspense>
-                <CookieList />
-              </Suspense>
-            </div>
-          </div>
-        </CookieProvider>
-      </Suspense>
+      <div className="w-[240px] fixed h-screen border-gray-300 dark:border-gray-600 border-r">
+        <Aside selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+      </div>
+      <div className="ml-[240px]">
+        <Main selectedTab={selectedTab} />
+      </div>
     </div>
   );
 }

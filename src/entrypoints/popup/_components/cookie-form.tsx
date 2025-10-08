@@ -1,13 +1,13 @@
 import { useForm } from "react-hook-form";
-import { CheckBox } from "../../../components/base/check-box";
-import { TextBox } from "../../../components/base/text-box";
+import {
+  CheckBox,
+  SelectBox,
+  Textarea,
+  TextBox,
+} from "../../../components/base/form";
+import type { Cookie, SetCookie, UpdateSetCookie } from "../../../libs/browser";
 import { cls } from "../../../utils/cls";
 import { unixTimeToDate } from "../../../utils/date";
-import type {
-  Cookie,
-  SetCookie,
-  UpdateSetCookie,
-} from "../_providers/cookie-provider";
 
 export enum CookieFormMode {
   Create = 0,
@@ -52,8 +52,6 @@ export function CookieForm(props: CookieFormProps) {
     },
   });
 
-  // dateToUnixTime(new Date(e.currentTarget.value));
-
   const onSubmit = handleSubmit((data) => {
     if (props.mode === CookieFormMode.Create) {
       props.onSave?.({
@@ -77,11 +75,7 @@ export function CookieForm(props: CookieFormProps) {
         {/* Value */}
         <div className="flex w-full flex-col gap-1">
           <p className="px-2 text-sm font-bold">Value</p>
-          <textarea
-            className="w-full resize-none rounded border border-slate-300 bg-white p-2 dark:border-slate-600 dark:bg-slate-800"
-            rows={3}
-            {...register("value")}
-          />
+          <Textarea rows={3} {...register("value")} />
         </div>
 
         {/* Domain & Path */}
@@ -106,18 +100,15 @@ export function CookieForm(props: CookieFormProps) {
         <div className="w-min">
           <label className="flex cursor-pointer items-center gap-2">
             <p className="text-sm font-bold">SameSite</p>
-            <div className="relative flex items-center justify-end">
-              <div className="size-3 i-ph-caret-down text-slate-800 dark:text-white absolute mr-2" />
-              <select
-                value={props.cookie.browserCookie.sameSite}
-                className="cursor-pointer appearance-none rounded border border-slate-300 bg-white p-2 pr-5 dark:border-slate-600 dark:bg-slate-800"
-              >
-                <option value="unspecified">Unspecified</option>
-                <option value="no_restriction">No Restriction</option>
-                <option value="lax">Lax</option>
-                <option value="strict">Strict</option>
-              </select>
-            </div>
+
+            <SelectBox
+              options={[
+                { value: "unspecified", label: "Unspecified" },
+                { value: "no_restriction", label: "No Restriction" },
+                { value: "lax", label: "Lax" },
+                { value: "strict", label: "Strict" },
+              ]}
+            />
           </label>
         </div>
 
@@ -148,7 +139,7 @@ export function CookieForm(props: CookieFormProps) {
             <button
               type="button"
               onClick={() => props.onRemove?.()}
-              className="block rounded border border-slate-300 bg-white p-2 transition-colors hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-900"
+              className="block rounded border border-gray-300 bg-white p-2 transition-colors hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:hover:bg-gray-950"
             >
               <div className="flex h-5 w-5 items-center justify-center">
                 <div className="size-4 i-ph-trash" />
@@ -160,7 +151,7 @@ export function CookieForm(props: CookieFormProps) {
           <button
             type="button"
             onClick={() => props.onCancel?.()}
-            className="rounded border border-slate-300 bg-white px-6 py-2 text-sm font-bold transition-colors hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-900"
+            className="rounded border border-gray-300 bg-white px-6 py-2 text-sm font-bold transition-colors hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:hover:bg-gray-950"
           >
             Cancel
           </button>

@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 import { useEffect, useMemo, useState } from "react";
-import { type Browser, browser } from "#imports";
+import { type Browser, browser } from "wxt/browser";
 
 export function useTabs() {
   const [tabs, setTabs] = useState<Browser.tabs.Tab[]>([]);

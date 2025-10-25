@@ -1,7 +1,6 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useMemo, useRef, useState } from "react";
-import type { Browser } from "wxt/browser";
-import { browser } from "#imports";
+import { type Browser, browser } from "wxt/browser";
 import { useEffectUntil } from "../../../hooks/effect";
 import { useCurrentTab, useSearchTabs, useTabs } from "../../../hooks/tab";
 import { cls } from "../../../utils/cls";
@@ -52,8 +51,8 @@ export function Aside({ selectedTab, setSelectedTab }: AsideProps) {
   }, [virtualizer, tabs, setSelectedTab, currentTab]);
 
   return (
-    <aside className="bg-gray-50 dark:bg-gray-950 flex h-full flex-col justify-between">
-      <div className="p-2  flex flex-col gap-2">
+    <aside className="flex h-full flex-col justify-between">
+      <div className="p-2 pb-1 flex flex-col gap-2">
         <div className="sticky">
           <input
             defaultValue={searchText}
@@ -69,7 +68,7 @@ export function Aside({ selectedTab, setSelectedTab }: AsideProps) {
 
       <div
         ref={scrollRef}
-        className="overflow-y-scroll overscroll-y-contain p-2 h-full"
+        className="overflow-y-scroll overscroll-y-contain py-2 pl-2 pr-1 h-full"
       >
         <div
           style={{
@@ -78,7 +77,9 @@ export function Aside({ selectedTab, setSelectedTab }: AsideProps) {
           }}
         >
           {virtualizer.getVirtualItems().map((item) => {
-            const tab = tabs[item.index] as Browser.tabs.Tab | null;
+            const tab = tabs[item.index];
+            if (tab === undefined) return null;
+
             const isSelected = tab?.id === selectedTab?.id;
 
             return (
@@ -124,7 +125,7 @@ export function Aside({ selectedTab, setSelectedTab }: AsideProps) {
         </div>
       </div>
 
-      <div className="text-center p-1 text-xs text-gray-400 font-medium">
+      <div className="text-center text-xs py-2 text-gray-400 font-medium">
         {manifest.name} {manifest.version}
       </div>
     </aside>

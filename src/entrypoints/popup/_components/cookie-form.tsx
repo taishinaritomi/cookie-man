@@ -37,7 +37,7 @@ export function CookieForm(props: CookieFormProps) {
     ? unixTimeToDate(props.cookie.browserCookie.expirationDate).toISOString()
     : "Session";
 
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       name: props.cookie.browserCookie.name,
       value: props.cookie.browserCookie.value,
@@ -59,6 +59,30 @@ export function CookieForm(props: CookieFormProps) {
         name: data.name,
         value: data.value,
         domain: data.domain,
+        path: data.path,
+        expirationDate:
+          data.expirationDate === "Session"
+            ? undefined
+            : new Date(data.expirationDate).getTime() / 1000,
+        sameSite: data.sameSite,
+        secure: data.secure,
+        httpOnly: data.httpOnly,
+      });
+    }
+
+    if (props.mode === CookieFormMode.Edit) {
+      props.onUpdate?.({
+        name: data.name,
+        value: data.value,
+        domain: data.domain,
+        path: data.path,
+        expirationDate:
+          data.expirationDate === "Session"
+            ? undefined
+            : new Date(data.expirationDate).getTime() / 1000,
+        sameSite: data.sameSite,
+        secure: data.secure,
+        httpOnly: data.httpOnly,
       });
     }
   });
@@ -69,7 +93,7 @@ export function CookieForm(props: CookieFormProps) {
         {/* Name */}
         <div className="flex flex-col gap-1">
           <p className="px-2 text-sm font-bold">Name</p>
-          <TextBox placeholder={"unknown"} {...register("name")} />
+          <TextBox {...register("name")} />
         </div>
 
         {/* Value */}
@@ -139,7 +163,7 @@ export function CookieForm(props: CookieFormProps) {
             <button
               type="button"
               onClick={() => props.onRemove?.()}
-              className="block rounded border border-gray-300 bg-white p-2 transition-colors hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:hover:bg-gray-950"
+              className="block rounded-xl border border-gray-300 bg-white p-2 transition-colors hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:hover:bg-gray-950"
             >
               <div className="flex h-5 w-5 items-center justify-center">
                 <div className="size-4 i-ph-trash" />
@@ -150,8 +174,11 @@ export function CookieForm(props: CookieFormProps) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => props.onCancel?.()}
-            className="rounded border border-gray-300 bg-white px-6 py-2 text-sm font-bold transition-colors hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:hover:bg-gray-950"
+            onClick={() => {
+              props.onCancel?.();
+              reset();
+            }}
+            className="rounded-xl border border-gray-300 bg-white px-6 py-2 text-sm font-bold transition-colors hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-900 dark:hover:bg-gray-950"
           >
             Cancel
           </button>
@@ -159,7 +186,7 @@ export function CookieForm(props: CookieFormProps) {
           <button
             type="submit"
             className={cls(
-              "px-6 py-2 text-sm rounded text-white font-bold transition-all bg-blue-500 border border-blue-500 enabled:hover:bg-blue-600 disabled:opacity-30",
+              "px-6 py-2 text-sm rounded-xl text-white font-bold transition-all bg-blue-500 border border-blue-500 enabled:hover:bg-blue-600 disabled:opacity-30",
             )}
           >
             Save

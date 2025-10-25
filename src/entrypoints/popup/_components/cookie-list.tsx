@@ -1,6 +1,8 @@
-import * as Accordion from "@radix-ui/react-accordion";
+// import * as Accordion from "@radix-ui/react-accordion";
+
+import { Accordion } from "@base-ui-components/react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { type Cookie, removeCookie, updateCookie } from "../../../libs/browser";
 import { cls } from "../../../utils/cls";
 import { CookieForm, CookieFormMode } from "./cookie-form";
@@ -11,6 +13,7 @@ type CookieListProps = {
 
 export function CookieList({ cookies }: CookieListProps) {
   const parentRef = useRef<HTMLDivElement | null>(null);
+  const [accordions, setAccordions] = useState<string[]>([]);
 
   const virtualizer = useWindowVirtualizer({
     count: cookies.length,
@@ -30,7 +33,9 @@ export function CookieList({ cookies }: CookieListProps) {
       {cookies.length === 0 && <NoCookie />}
       {cookies.length > 0 && (
         <Accordion.Root
-          type="multiple"
+          value={accordions}
+          onValueChange={(value) => setAccordions(value)}
+          multiple
           style={{
             height: virtualizer.getTotalSize(),
             width: "100%",
@@ -48,7 +53,9 @@ export function CookieList({ cookies }: CookieListProps) {
             className="flex flex-col gap-2 pb-2"
           >
             {items.map((item) => {
-              const cookie = cookies[item.index] as Cookie;
+              const cookie = cookies[item.index];
+
+              if (!cookie) return null;
 
               return (
                 <div
@@ -56,7 +63,14 @@ export function CookieList({ cookies }: CookieListProps) {
                   data-index={item.index}
                   ref={virtualizer.measureElement}
                 >
-                  <CookieItem cookie={cookie} />
+                  <CookieItem
+                    cookie={cookie}
+                    onClose={() => {
+                      setAccordions((prev) => {
+                        return prev.filter((id) => id !== cookie.id);
+                      });
+                    }}
+                  />
                 </div>
               );
             })}
@@ -77,9 +91,10 @@ function NoCookie() {
 
 type CookieItemProps = {
   cookie: Cookie;
+  onClose?: () => void;
 };
 
-function CookieItem({ cookie }: CookieItemProps) {
+function CookieItem({ cookie, onClose }: CookieItemProps) {
   return (
     <Accordion.Item
       value={cookie.id}
@@ -107,12 +122,12 @@ function CookieItem({ cookie }: CookieItemProps) {
             <p className="truncate text-slate-500 dark:text-slate-400">
               {cookie.displayURL}
             </p>
-            {cookie.browserCookie.partitionKey?.hasCrossSiteAncestor}
+            {cookie.browserCookie.partitionKey?.topLevelSite}
           </div>
         </div>
       </Accordion.Trigger>
 
-      <Accordion.Content
+      <Accordion.Panel
         className={cls("p-3 border-t border-slate-300 dark:border-slate-600")}
       >
         <CookieForm
@@ -120,8 +135,9 @@ function CookieItem({ cookie }: CookieItemProps) {
           mode={CookieFormMode.Edit}
           onUpdate={(newCookie) => updateCookie(cookie, newCookie)}
           onRemove={() => removeCookie(cookie)}
+          onCancel={() => onClose?.()}
         />
-      </Accordion.Content>
+      </Accordion.Panel>
     </Accordion.Item>
   );
 }

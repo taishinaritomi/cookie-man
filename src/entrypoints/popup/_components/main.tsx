@@ -50,6 +50,12 @@ export function Main({ selectedTab }: MainProps) {
     });
   }, [selectedTab?.url]);
 
+  async function refreshCookies() {
+    const cookies = await getCookies(selectedTab?.url ?? null);
+
+    setCookies(cookies.map((cookie) => formatCookie(cookie)));
+  }
+
   return (
     <div className="flex flex-col gap-3 p-2 pr-1 w-full">
       <Header
@@ -71,6 +77,7 @@ export function Main({ selectedTab }: MainProps) {
                   ...cookie,
                   url: selectedTab?.url ?? "http://example.com",
                 });
+                await refreshCookies();
                 setIsCreateOpen(false);
               }}
               onCancel={() => setIsCreateOpen(false)}
@@ -78,7 +85,10 @@ export function Main({ selectedTab }: MainProps) {
           </div>
         )}
 
-        <CookieList cookies={searchedCookies} />
+        <CookieList
+          cookies={searchedCookies}
+          onRefetch={() => refreshCookies()}
+        />
       </div>
     </div>
   );

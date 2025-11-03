@@ -3,15 +3,15 @@
 import { Accordion } from "@base-ui-components/react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useRef, useState } from "react";
-import { type Cookie, removeCookie, updateCookie } from "../../../libs/browser";
-import { cls } from "../../../utils/cls";
-import { CookieForm, CookieFormMode } from "./cookie-form";
+import type { Cookie } from "../../../libs/browser";
+import { CookieItem } from "./cookie-item";
 
 type CookieListProps = {
   cookies: Cookie[];
+  onRefetch: () => void;
 };
 
-export function CookieList({ cookies }: CookieListProps) {
+export function CookieList({ cookies, onRefetch }: CookieListProps) {
   const parentRef = useRef<HTMLDivElement | null>(null);
   const [accordions, setAccordions] = useState<string[]>([]);
 
@@ -65,6 +65,7 @@ export function CookieList({ cookies }: CookieListProps) {
                 >
                   <CookieItem
                     cookie={cookie}
+                    onRefetch={() => onRefetch()}
                     onClose={() => {
                       setAccordions((prev) => {
                         return prev.filter((id) => id !== cookie.id);
@@ -86,58 +87,5 @@ function NoCookie() {
     <div className="my-8 flex items-center justify-center">
       <p className="text-xs">No Cookie</p>
     </div>
-  );
-}
-
-type CookieItemProps = {
-  cookie: Cookie;
-  onClose?: () => void;
-};
-
-function CookieItem({ cookie, onClose }: CookieItemProps) {
-  return (
-    <Accordion.Item
-      value={cookie.id}
-      className={cls(
-        "border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-200 dark:bg-slate-800 group",
-      )}
-    >
-      <Accordion.Trigger className={cls("p-2 rounded-xl truncate w-full")}>
-        <div className="flex items-center gap-2">
-          <div
-            className={
-              "transition-transform size-4 rotate-0  group-data-[state=open]:rotate-90 i-ph-caret-right text-slate-500 dark:text-slate-400 shrink-0"
-            }
-          />
-          <div className="flex flex-col gap-1 overflow-hidden text-left">
-            <p
-              className={cls(
-                "font-bold text-base pl-1 truncate",
-                cookie.browserCookie.name ? "" : "opacity-50",
-              )}
-            >
-              {cookie.browserCookie.name || "unknown"}
-            </p>
-
-            <p className="truncate text-slate-500 dark:text-slate-400">
-              {cookie.displayURL}
-            </p>
-            {cookie.browserCookie.partitionKey?.topLevelSite}
-          </div>
-        </div>
-      </Accordion.Trigger>
-
-      <Accordion.Panel
-        className={cls("p-3 border-t border-slate-300 dark:border-slate-600")}
-      >
-        <CookieForm
-          cookie={cookie}
-          mode={CookieFormMode.Edit}
-          onUpdate={(newCookie) => updateCookie(cookie, newCookie)}
-          onRemove={() => removeCookie(cookie)}
-          onCancel={() => onClose?.()}
-        />
-      </Accordion.Panel>
-    </Accordion.Item>
   );
 }

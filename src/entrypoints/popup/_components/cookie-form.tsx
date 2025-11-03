@@ -64,7 +64,7 @@ export function CookieForm(props: CookieFormProps) {
           data.expirationDate === "Session"
             ? undefined
             : new Date(data.expirationDate).getTime() / 1000,
-        sameSite: data.sameSite,
+        sameSite: "no_restriction",
         secure: data.secure,
         httpOnly: data.httpOnly,
       });
@@ -126,6 +126,7 @@ export function CookieForm(props: CookieFormProps) {
             <p className="text-sm font-bold">SameSite</p>
 
             <SelectBox
+              {...register("sameSite")}
               options={[
                 { value: "unspecified", label: "Unspecified" },
                 { value: "no_restriction", label: "No Restriction" },

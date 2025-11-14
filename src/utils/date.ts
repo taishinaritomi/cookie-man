@@ -1,4 +1,7 @@
-export const dateToUnixTime = (date: Date) =>
-  parseInt((date.getTime() / 1000).toFixed(0));
+export function dateToUnixTime(date: Date) {
+  return Number.parseInt((date.getTime() / 1000).toFixed(0), 10);
+}
 
-export const unixTimeToDate = (unixTime: number) => new Date(unixTime * 1000.0);
+export function unixTimeToDate(unixTime: number) {
+  return new Date(unixTime * 1000.0);
+}

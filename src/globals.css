@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+@layer base {
+  button,
+  [role="button"] {
+    @apply cursor-pointer;
+  }
+
+  button:disabled,
+  [role="button"]:disabled {
+    @apply cursor-default;
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  :root {
+    color-scheme: light dark;
+  }
+
+  input {
+    @apply font-sans font-medium;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    @apply outline-none focus-visible:ring-2;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    ::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  summary {
+    display: block;
+  }
+
+  /* Chrome、Safari */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
